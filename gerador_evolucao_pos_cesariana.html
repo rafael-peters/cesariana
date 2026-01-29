@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Evolução Pós-Cesariana</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: white; text-align: center; margin-bottom: 10px; font-size: 1.8em; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .subtitle { color: rgba(255,255,255,0.9); text-align: center; margin-bottom: 20px; font-size: 0.95em; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .card-title { color: #5a67d8; font-weight: 600; font-size: 1.1em; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; gap: 8px; }
+        .card-title::before { content: ''; width: 4px; height: 20px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 2px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        label { font-size: 0.85em; color: #4a5568; margin-bottom: 4px; font-weight: 500; }
+        input, select, textarea { padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95em; transition: all 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+        select { background: white; cursor: pointer; }
+        textarea { resize: vertical; min-height: 60px; }
+        .btn-group { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102,126,234,0.4); }
+        .btn-secondary { background: #48bb78; color: white; }
+        .btn-secondary:hover { background: #38a169; }
+        .btn-outline { background: white; color: #667eea; border: 2px solid #667eea; }
+        .btn-outline:hover { background: #667eea; color: white; }
+        .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .preset-btn { padding: 8px 16px; background: #edf2f7; border: none; border-radius: 20px; font-size: 0.85em; cursor: pointer; transition: all 0.2s; }
+        .preset-btn:hover { background: #667eea; color: white; }
+        .preset-btn.active { background: #667eea; color: white; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 12px; max-width: 800px; width: 100%; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
+        .modal-header { padding: 15px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 1.1em; }
+        .modal-close { background: none; border: none; color: white; font-size: 1.5em; cursor: pointer; }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .modal-body pre { white-space: pre-wrap; font-family: 'Consolas', monospace; font-size: 0.9em; line-height: 1.6; background: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .modal-footer { padding: 15px 20px; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; justify-content: flex-end; }
+        .sv-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        @media (max-width: 600px) { 
+            .sv-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.4em; }
+        }
+        .dpo-toggle { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
+        .dpo-btn { padding: 10px 30px; border: 2px solid #667eea; background: white; color: #667eea; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .dpo-btn.active { background: #667eea; color: white; }
+        .info-box { background: #ebf8ff; border-left: 4px solid #4299e1; padding: 12px; border-radius: 0 8px 8px 0; margin-bottom: 15px; font-size: 0.9em; color: #2b6cb0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 Evolução Pós-Cesariana</h1>
+        <p class="subtitle">Gerador automático baseado em ERAS Society 2025 | NICE/RCOG | ACOG</p>
+
+        <!-- DPO Toggle -->
+        <div class="card">
+            <div class="dpo-toggle">
+                <button class="dpo-btn active" onclick="setDPO(1)">1º DPO</button>
+                <button class="dpo-btn" onclick="setDPO(2)">2º DPO</button>
+            </div>
+            <div class="presets">
+                <span style="font-size:0.85em; color:#718096; margin-right:8px;">Presets:</span>
+                <button class="preset-btn" onclick="presetNormal()">✓ Evolução Normal</button>
+                <button class="preset-btn" onclick="presetDor()">⚠ Dor Aumentada</button>
+                <button class="preset-btn" onclick="presetAlta()">🏠 Pronta p/ Alta</button>
+            </div>
+        </div>
+
+        <!-- Identificação -->
+        <div class="card">
+            <div class="card-title">Identificação</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Nome da Paciente</label>
+                    <input type="text" id="nome" placeholder="Nome completo">
+                </div>
+                <div class="form-group">
+                    <label>Leito</label>
+                    <input type="text" id="leito" placeholder="Ex: 201-A">
+                </div>
+                <div class="form-group">
+                    <label>Data da Cesariana</label>
+                    <input type="date" id="dataCirurgia">
+                </div>
+            </div>
+        </div>
+
+        <!-- Subjetivo -->
+        <div class="card">
+            <div class="card-title">Subjetivo (Queixas)</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Dor (EVA 0-10)</label>
+                    <select id="eva">
+                        <option value="0">0 - Sem dor</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3" selected>3 - Leve</option>
+                        <option value="4">4</option>
+                        <option value="5">5 - Moderada</option>
+                        <option value="6">6</option>
+                        <option value="7">7 - Intensa</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10 - Insuportável</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Febre/Calafrios</label>
+                    <select id="febre">
+                        <option value="Nega febre ou calafrios">Nega</option>
+                        <option value="Refere febre">Refere febre</option>
+                        <option value="Refere calafrios">Refere calafrios</option>
+                        <option value="Refere febre e calafrios">Febre e calafrios</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Diurese</label>
+                    <select id="diurese">
+                        <option value="espontânea presente">Espontânea presente</option>
+                        <option value="presente após retirada de SVD">Após retirada SVD</option>
+                        <option value="ainda com sonda vesical">Ainda com SVD</option>
+                        <option value="com retenção urinária">Retenção urinária</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Evacuação</label>
+                    <select id="evacuacao">
+                        <option value="ainda não evacuou">Ainda não evacuou</option>
+                        <option value="evacuou">Evacuou</option>
+                        <option value="constipação">Constipação</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Flatos</label>
+                    <select id="flatos">
+                        <option value="presente">Presente</option>
+                        <option value="ausente">Ausente</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Aceitação Dieta</label>
+                    <select id="aceitacaoDieta">
+                        <option value="boa">Boa</option>
+                        <option value="regular">Regular</option>
+                        <option value="ruim">Ruim</option>
+                        <option value="com náuseas/vômitos">Náuseas/vômitos</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amamentação</label>
+                    <select id="amamentacao">
+                        <option value="em curso, com boa pega">Boa pega</option>
+                        <option value="com dificuldades de pega">Dificuldade de pega</option>
+                        <option value="com ingurgitamento mamário">Ingurgitamento</option>
+                        <option value="com fissuras mamilares">Fissuras mamilares</option>
+                        <option value="não iniciada">Não iniciada</option>
+                        <option value="não deseja amamentar">Não deseja</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Deambulação</label>
+                    <select id="deambulacao">
+                        <option value="já iniciada, sem dificuldades">Iniciada, sem dificuldades</option>
+                        <option value="iniciada, com dificuldades">Iniciada, com dificuldades</option>
+                        <option value="ainda não iniciada">Não iniciada</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sinais Vitais -->
+        <div class="card">
+            <div class="card-title">Sinais Vitais</div>
+            <div class="sv-grid">
+                <div class="form-group">
+                    <label>PA (mmHg)</label>
+                    <input type="text" id="pa" value="120x80" placeholder="120x80">
+                </div>
+                <div class="form-group">
+                    <label>FC (bpm)</label>
+                    <input type="number" id="fc" value="78" placeholder="78">
+                </div>
+                <div class="form-group">
+                    <label>FR (irpm)</label>
+                    <input type="number" id="fr" value="16" placeholder="16">
+                </div>
+                <div class="form-group">
+                    <label>Tax (°C)</label>
+                    <input type="text" id="tax" value="36.5" placeholder="36.5">
+                </div>
+                <div class="form-group">
+                    <label>SpO₂ (%)</label>
+                    <input type="number" id="spo2" value="98" placeholder="98">
+                </div>
+            </div>
+        </div>
+
+        <!-- Exame Físico -->
+        <div class="card">
+            <div class="card-title">Exame Físico</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Estado Geral</label>
+                    <select id="estadoGeral">
+                        <option value="Bom, lúcida, orientada, corada, hidratada, afebril">BEG, LOTE, corada, hidratada, afebril</option>
+                        <option value="Regular, lúcida, orientada, corada, hidratada, afebril">REG, LOTE, corada, hidratada</option>
+                        <option value="Regular, hipocorada, desidratada">REG, hipocorada, desidratada</option>
+                        <option value="Mau estado geral">MEG</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mamas</label>
+                    <select id="mamas">
+                        <option value="Túrgidas, colostro presente, mamilos íntegros, sem sinais de ingurgitamento">Túrgidas, colostro, mamilos íntegros</option>
+                        <option value="Ingurgitadas, apojadura em curso, mamilos íntegros">Ingurgitadas, apojadura em curso</option>
+                        <option value="Ingurgitadas, apojadura estabelecida">Apojadura estabelecida</option>
+                        <option value="Com fissuras mamilares leves">Fissuras mamilares leves</option>
+                        <option value="Com fissuras mamilares importantes">Fissuras importantes</option>
+                        <option value="Com sinais de mastite (hiperemia, calor, dor localizada)">Sinais de mastite</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Abdome</label>
+                    <select id="abdome">
+                        <option value="Globoso, flácido, RHA presentes, doloroso à palpação superficial em FO, sem sinais de irritação peritoneal">Flácido, RHA+, doloroso em FO</option>
+                        <option value="Globoso, flácido, RHA hipoativos, doloroso em FO">Flácido, RHA hipoativos</option>
+                        <option value="Distendido, RHA ausentes, timpânico">Distendido, RHA ausentes</option>
+                        <option value="Com sinais de irritação peritoneal">Irritação peritoneal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Útero - Contração</label>
+                    <select id="uteroContracao">
+                        <option value="Bem contraído">Bem contraído</option>
+                        <option value="Contraído">Contraído</option>
+                        <option value="Subinvoluído (amolecido)">Subinvoluído</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Útero - Altura Fundo</label>
+                    <select id="uteroAltura">
+                        <option value="ao nível da cicatriz umbilical">Ao nível do umbigo</option>
+                        <option value="1 cm abaixo da cicatriz umbilical" selected>1 cm abaixo do umbigo</option>
+                        <option value="2 cm abaixo da cicatriz umbilical">2 cm abaixo do umbigo</option>
+                        <option value="3 cm abaixo da cicatriz umbilical">3 cm abaixo do umbigo</option>
+                        <option value="entre umbigo e sínfise púbica">Entre umbigo e sínfise</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ferida Operatória</label>
+                    <select id="feridaOp">
+                        <option value="Limpa, seca, bordas coaptadas, sem sinais flogísticos">Limpa, seca, sem flogose</option>
+                        <option value="Curativo limpo e seco">Curativo limpo e seco</option>
+                        <option value="Curativo com discreta secreção serosanguinolenta">Secreção serosanguinolenta</option>
+                        <option value="Hiperemia periincisional leve">Hiperemia leve</option>
+                        <option value="Hiperemia importante, sinais de infecção">Sinais de infecção</option>
+                        <option value="Deiscência parcial">Deiscência parcial</option>
+                        <option value="Secreção purulenta">Secreção purulenta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lóquios</label>
+                    <select id="loquios">
+                        <option value="Rubros, em quantidade moderada, sem odor fétido">Rubros, moderados, sem odor</option>
+                        <option value="Rubros, em quantidade pequena, sem odor fétido">Rubros, pequena qtd</option>
+                        <option value="Rubros, em quantidade aumentada">Rubros, aumentados</option>
+                        <option value="Serosos (acastanhados), sem odor fétido">Serosos (acastanhados)</option>
+                        <option value="Com odor fétido">Com odor fétido ⚠️</option>
+                        <option value="Alba (amarelados/esbranquiçados)">Alba (amarelados)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Membros Inferiores</label>
+                    <select id="mmii">
+                        <option value="Sem edema, panturrilhas livres, Homans negativo bilateral">Sem edema, Homans (−)</option>
+                        <option value="Edema leve bilateral (+/4+)">Edema leve bilateral</option>
+                        <option value="Edema moderado bilateral (++/4+)">Edema moderado</option>
+                        <option value="Empastamento de panturrilha - investigar TVP">Empastamento ⚠️</option>
+                        <option value="Homans positivo - investigar TVP">Homans (+) ⚠️</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conduta -->
+        <div class="card">
+            <div class="card-title">Conduta / Plano</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Dieta</label>
+                    <select id="dietaConduta">
+                        <option value="Livre">Livre</option>
+                        <option value="Líquida">Líquida</option>
+                        <option value="Pastosa">Pastosa</option>
+                        <option value="Branda">Branda</option>
+                        <option value="Zero">Zero (jejum)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Hidratação IV</label>
+                    <select id="hidratacao">
+                        <option value="Suspensa">Suspensa</option>
+                        <option value="SF 0,9% 1000mL 8/8h">SF 0,9% 1000mL 8/8h</option>
+                        <option value="RL 1000mL 8/8h">RL 1000mL 8/8h</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Sonda Vesical</label>
+                    <select id="svd">
+                        <option value="Já retirada">Já retirada</option>
+                        <option value="Retirar após evolução">Retirar agora</option>
+                        <option value="Manter por retenção urinária">Manter (retenção)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Paracetamol</label>
+                    <select id="paracetamol">
+                        <option value="1g VO 6/6h">1g VO 6/6h</option>
+                        <option value="1g IV 6/6h">1g IV 6/6h</option>
+                        <option value="750mg VO 6/6h">750mg VO 6/6h</option>
+                        <option value="Não prescrito">Não prescrito</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Anti-inflamatório</label>
+                    <select id="aine">
+                        <option value="Ibuprofeno 400mg VO 8/8h">Ibuprofeno 400mg 8/8h</option>
+                        <option value="Ibuprofeno 600mg VO 8/8h">Ibuprofeno 600mg 8/8h</option>
+                        <option value="Cetoprofeno 100mg VO 12/12h">Cetoprofeno 100mg 12/12h</option>
+                        <option value="Diclofenaco 50mg VO 8/8h">Diclofenaco 50mg 8/8h</option>
+                        <option value="Não prescrito">Não prescrito</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Analgesia Resgate</label>
+                    <select id="resgate">
+                        <option value="Tramadol 50mg VO se EVA > 6">Tramadol 50mg VO</option>
+                        <option value="Tramadol 100mg VO se EVA > 6">Tramadol 100mg VO</option>
+                        <option value="Dipirona 1g IV se EVA > 6">Dipirona 1g IV</option>
+                        <option value="Morfina 5mg SC se EVA > 7">Morfina 5mg SC</option>
+                        <option value="Não prescrito">Não prescrito</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Profilaxia TEV Mecânica</label>
+                    <select id="tevMecanica">
+                        <option value="Deambulação precoce + compressão pneumática até deambular">Deambulação + CPI</option>
+                        <option value="Deambulação precoce">Deambulação apenas</option>
+                        <option value="Compressão pneumática intermitente (acamada)">CPI (acamada)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Enoxaparina</label>
+                    <select id="enoxaparina">
+                        <option value="Não indicada (baixo risco)">Não indicada</option>
+                        <option value="40mg SC 1x/dia por 7-10 dias (risco intermediário)">40mg 1x/dia (risco interm.)</option>
+                        <option value="40mg SC 12/12h por 6 semanas (alto risco ou IMC>40)">40mg 12/12h (alto risco)</option>
+                        <option value="Contraindicada por sangramento">Contraindicada</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Curativo FO</label>
+                    <select id="curativoFO">
+                        <option value="Retirado, manter descoberto e seco">Descoberto, manter seco</option>
+                        <option value="Manter curativo limpo e seco">Manter curativo</option>
+                        <option value="Trocar curativo diário">Trocar diário</option>
+                        <option value="Avaliar - curativo com secreção">Avaliar secreção</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Antiemético SN</label>
+                    <select id="antiemetico">
+                        <option value="Ondansetrona 4mg IV SN">Ondansetrona 4mg IV</option>
+                        <option value="Metoclopramida 10mg IV SN">Metoclopramida 10mg IV</option>
+                        <option value="Não prescrito">Não prescrito</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Laxativo SN</label>
+                    <select id="laxativo">
+                        <option value="Lactulose 15mL VO SN se não evacuar">Lactulose 15mL VO SN</option>
+                        <option value="Bisacodil 5mg VO SN">Bisacodil 5mg VO SN</option>
+                        <option value="Não prescrito">Não prescrito</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label>Observações Adicionais</label>
+                    <textarea id="observacoes" placeholder="Outras observações ou condutas específicas..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões -->
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="gerarEvolucao()">📋 Gerar Evolução</button>
+            <button class="btn btn-secondary" onclick="gerarAmbas()">📄 Gerar 1º + 2º DPO</button>
+            <button class="btn btn-outline" onclick="limparForm()">🔄 Limpar</button>
+        </div>
+
+        <!-- Créditos -->
+        <p style="text-align:center; color:rgba(255,255,255,0.7); margin-top:20px; font-size:0.85em;">
+            Baseado em ERAS Society 2025, NICE/RCOG, ACOG, SMFM
+        </p>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">📋 Evolução Gerada</h3>
+                <button class="modal-close" onclick="fecharModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <pre id="resultado"></pre>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="copiar()">📋 Copiar</button>
+                <button class="btn btn-outline" onclick="fecharModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let dpoAtual = 1;
+
+        function setDPO(n) {
+            dpoAtual = n;
+            document.querySelectorAll('.dpo-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === n - 1);
+            });
+            // Ajustar altura uterina conforme DPO
+            const alturaSelect = document.getElementById('uteroAltura');
+            if (n === 1) {
+                alturaSelect.value = '1 cm abaixo da cicatriz umbilical';
+            } else {
+                alturaSelect.value = '2 cm abaixo da cicatriz umbilical';
+            }
+        }
+
+        function presetNormal() {
+            document.getElementById('eva').value = '3';
+            document.getElementById('febre').value = 'Nega febre ou calafrios';
+            document.getElementById('diurese').value = 'espontânea presente';
+            document.getElementById('flatos').value = 'presente';
+            document.getElementById('aceitacaoDieta').value = 'boa';
+            document.getElementById('amamentacao').value = 'em curso, com boa pega';
+            document.getElementById('deambulacao').value = 'já iniciada, sem dificuldades';
+            document.getElementById('estadoGeral').value = 'Bom, lúcida, orientada, corada, hidratada, afebril';
+            document.getElementById('uteroContracao').value = 'Bem contraído';
+            document.getElementById('feridaOp').value = 'Limpa, seca, bordas coaptadas, sem sinais flogísticos';
+            document.getElementById('loquios').value = 'Rubros, em quantidade moderada, sem odor fétido';
+            document.getElementById('mmii').value = 'Sem edema, panturrilhas livres, Homans negativo bilateral';
+            document.getElementById('hidratacao').value = 'Suspensa';
+            document.getElementById('svd').value = 'Já retirada';
+            setDPO(dpoAtual);
+        }
+
+        function presetDor() {
+            presetNormal();
+            document.getElementById('eva').value = '6';
+            document.getElementById('deambulacao').value = 'iniciada, com dificuldades';
+            document.getElementById('resgate').value = 'Tramadol 100mg VO se EVA > 6';
+        }
+
+        function presetAlta() {
+            presetNormal();
+            setDPO(2);
+            document.getElementById('eva').value = '2';
+            document.getElementById('evacuacao').value = 'evacuou';
+            document.getElementById('mamas').value = 'Ingurgitadas, apojadura estabelecida';
+            document.getElementById('loquios').value = 'Serosos (acastanhados), sem odor fétido';
+            document.getElementById('curativoFO').value = 'Retirado, manter descoberto e seco';
+        }
+
+        function limparForm() {
+            document.querySelectorAll('input:not([type="date"])').forEach(el => el.value = '');
+            document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+            document.getElementById('pa').value = '120x80';
+            document.getElementById('fc').value = '78';
+            document.getElementById('fr').value = '16';
+            document.getElementById('tax').value = '36.5';
+            document.getElementById('spo2').value = '98';
+            setDPO(1);
+        }
+
+        function getDataHora() {
+            const now = new Date();
+            return now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+        }
+
+        function gerarTexto(dpo) {
+            const v = (id) => document.getElementById(id).value;
+            
+            let texto = `EVOLUÇÃO MÉDICA – ${dpo}º DPO de Cesariana
+Data/Hora: ${getDataHora()}
+Paciente: ${v('nome') || '[Nome]'}
+Leito: ${v('leito') || '[Leito]'}
+
+SUBJETIVO:
+Paciente em ${dpo}º dia pós-operatório de cesariana, refere dor em ferida operatória EVA ${v('eva')}/10. ${v('febre')}. Eliminações: diurese ${v('diurese')}, ${v('evacuacao')}, flatos ${v('flatos')}. Aceitação de dieta oral ${v('aceitacaoDieta')}. Amamentação ${v('amamentacao')}. Deambulação ${v('deambulacao')}.
+
+OBJETIVO:
+Sinais vitais: PA ${v('pa')} mmHg | FC ${v('fc')} bpm | FR ${v('fr')} irpm | Tax ${v('tax')}°C | SpO₂ ${v('spo2')}%
+
+Exame físico:
+- Estado geral: ${v('estadoGeral')}
+- Mamas: ${v('mamas')}
+- Abdome: ${v('abdome')}
+- Útero: ${v('uteroContracao')}, fundo uterino ${v('uteroAltura')}
+- Ferida operatória: ${v('feridaOp')}
+- Lóquios: ${v('loquios')}
+- MMII: ${v('mmii')}
+
+AVALIAÇÃO:
+Puérpera em ${dpo}º DPO de cesariana, evolução clínica satisfatória.
+
+PLANO:
+- Dieta ${v('dietaConduta').toLowerCase()}
+- Hidratação IV: ${v('hidratacao')}
+- SVD: ${v('svd')}
+- Analgesia multimodal (ERAS):
+  • Paracetamol ${v('paracetamol')}
+  • ${v('aine') !== 'Não prescrito' ? v('aine') : 'AINE: não prescrito'}
+  • Resgate: ${v('resgate')}
+- Profilaxia TEV: ${v('tevMecanica')}${v('enoxaparina') !== 'Não indicada (baixo risco)' ? '\n  • Enoxaparina ' + v('enoxaparina') : ''}
+- Ferida operatória: ${v('curativoFO')}
+- Incentivo à amamentação em livre demanda
+${v('antiemetico') !== 'Não prescrito' ? '- ' + v('antiemetico') + ' (náuseas/vômitos)\n' : ''}${v('laxativo') !== 'Não prescrito' ? '- ' + v('laxativo') + '\n' : ''}${v('observacoes') ? '- ' + v('observacoes') + '\n' : ''}
+____________________________________
+Médico(a) Responsável - CRM:`;
+
+            return texto;
+        }
+
+        function gerarEvolucao() {
+            const texto = gerarTexto(dpoAtual);
+            document.getElementById('resultado').textContent = texto;
+            document.getElementById('modalTitle').textContent = `📋 Evolução ${dpoAtual}º DPO`;
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function gerarAmbas() {
+            let texto = gerarTexto(1);
+            texto += '\n\n' + '═'.repeat(60) + '\n\n';
+            texto += gerarTexto(2);
+            document.getElementById('resultado').textContent = texto;
+            document.getElementById('modalTitle').textContent = '📋 Evolução 1º + 2º DPO';
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function fecharModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        function copiar() {
+            const texto = document.getElementById('resultado').textContent;
+            navigator.clipboard.writeText(texto).then(() => {
+                alert('✅ Texto copiado para a área de transferência!');
+            }).catch(() => {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = texto;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                alert('✅ Texto copiado!');
+            });
+        }
+
+        // Fechar modal com ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') fecharModal();
+        });
+
+        // Inicializar
+        presetNormal();
+    </script>
+</body>
+</html>

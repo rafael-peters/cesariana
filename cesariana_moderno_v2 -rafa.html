@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descritor Cirúrgico - Cesariana</title>
+    
+    <!-- Google Fonts - Fontes profissionais médicas -->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Crimson+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ========================================
+           CSS Variables - Tema Médico Profissional
+           ======================================== */
+        :root {
+            /* Cores principais - Azul médico */
+            --primary-900: #0c2d48;
+            --primary-800: #145374;
+            --primary-700: #1a6fa3;
+            --primary-600: #2196f3;
+            --primary-500: #42a5f5;
+            --primary-100: #e3f2fd;
+            --primary-50: #f5faff;
+            
+            /* Cores de evidência */
+            --grade-a: #2e7d32;
+            --grade-a-bg: #e8f5e9;
+            --grade-b: #f57c00;
+            --grade-b-bg: #fff3e0;
+            --grade-c: #1565c0;
+            --grade-c-bg: #e3f2fd;
+            --grade-d: #c62828;
+            --grade-d-bg: #ffebee;
+            
+            /* Neutros */
+            --gray-900: #212121;
+            --gray-700: #424242;
+            --gray-600: #616161;
+            --gray-500: #757575;
+            --gray-400: #9e9e9e;
+            --gray-300: #bdbdbd;
+            --gray-200: #e0e0e0;
+            --gray-100: #f5f5f5;
+            --gray-50: #fafafa;
+            --white: #ffffff;
+            
+            /* Tipografia */
+            --font-body: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-heading: 'Crimson Pro', Georgia, serif;
+            
+            /* Espaçamento */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            
+            /* Bordas e sombras */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-focus: 0 0 0 3px rgba(33, 150, 243, 0.3);
+        }
+        
+        /* ========================================
+           Reset e Base
+           ======================================== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--gray-900);
+            background: linear-gradient(135deg, var(--primary-50) 0%, var(--gray-100) 100%);
+            min-height: 100vh;
+        }
+        
+        /* ========================================
+           Layout Principal
+           ======================================== */
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+        }
+        
+        /* Header */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-900) 0%, var(--primary-700) 100%);
+            color: var(--white);
+            padding: var(--space-xl) var(--space-lg);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-xl);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .app-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 60%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .app-header h1 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: var(--space-xs);
+            position: relative;
+        }
+        
+        .app-header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+            position: relative;
+        }
+        
+        /* ========================================
+           Cards e Seções
+           ======================================== */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--space-lg);
+            overflow: visible; /* ALTERADO para permitir dropdown aparecer */
+            transition: box-shadow 0.2s ease;
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .card-header {
+            background: var(--gray-50);
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .card-header h2 {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-800);
+        }
+        
+        .card-header .icon {
+            width: 24px;
+            height: 24px;
+            color: var(--primary-600);
+        }
+        
+        .card-body {
+            padding: var(--space-lg);
+        }
+        
+        /* ========================================
+           Grid de Formulário
+           ======================================== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-lg);
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+        
+        label .evidence-badge {
+            font-size: 0.625rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        label .evidence-a {
+            background: var(--grade-a-bg);
+            color: var(--grade-a);
+        }
+        
+        label .evidence-b {
+            background: var(--grade-b-bg);
+            color: var(--grade-b);
+        }
+        
+        label .evidence-c {
+            background: var(--grade-c-bg);
+            color: var(--grade-c);
+        }
+        
+        /* ========================================
+           Inputs e Controles
+           ======================================== */
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            color: var(--gray-900);
+            background: var(--white);
+            border: 1.5px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: var(--shadow-focus);
+        }
+        
+        input:hover,
+        select:hover,
+        textarea:hover {
+            border-color: var(--gray-400);
+        }
+        
+        /* Combobox Editável - Container */
+        .editable-combo {
+            position: relative;
+        }
+        
+        .editable-combo input {
+            padding-right: 40px;
+        }
+        
+        .editable-combo .dropdown-btn {
+            position: absolute;
+            right: 2px;
+            top: 2px;
+            bottom: 2px;
+            width: 36px;
+            background: var(--gray-100);
+            border: none;
+            border-radius: 0 6px 6px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        .editable-combo .dropdown-btn:hover {
+            background: var(--gray-200);
+        }
+        
+        .editable-combo .dropdown-btn svg {
+            width: 16px;
+            height: 16px;
+            color: var(--gray-600);
+            transition: transform 0.2s;
+        }
+        
+        .editable-combo.open .dropdown-btn svg {
+            transform: rotate(180deg);
+        }
+        
+        .editable-combo .dropdown-list {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border: 1.5px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            max-height: 240px;
+            overflow-y: auto;
+            z-index: 9999; /* ALTERADO: z-index aumentado */
+            display: none;
+        }
+        
+        .editable-combo.open .dropdown-list {
+            display: block;
+            animation: slideDown 0.15s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dropdown-list .option {
+            padding: var(--space-sm) var(--space-md);
+            cursor: pointer;
+            transition: background 0.1s;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .dropdown-list .option:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-list .option:hover {
+            background: var(--primary-100);
+        }
+        
+        .dropdown-list .option.selected {
+            background: var(--primary-100);
+            color: var(--primary-700);
+            font-weight: 500;
+        }
+        
+        /* ========================================
+           Seletor de Técnica Cirúrgica
+           ======================================== */
+        .technique-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+        }
+        
+        .technique-card {
+            position: relative;
+            padding: var(--space-lg);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--white);
+        }
+        
+        .technique-card:hover {
+            border-color: var(--primary-400);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .technique-card.selected {
+            border-color: var(--primary-600);
+            background: var(--primary-50);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .technique-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: var(--space-sm);
+            right: var(--space-sm);
+            width: 24px;
+            height: 24px;
+            background: var(--primary-600);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .technique-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .technique-card h3 {
+            font-family: var(--font-heading);
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .technique-card p {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+        
+        .technique-card .tags {
+            margin-top: var(--space-sm);
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+        
+        .technique-card .tag {
+            font-size: 0.625rem;
+            padding: 2px 8px;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        .technique-card.selected .tag {
+            background: var(--primary-100);
+            color: var(--primary-700);
+        }
+        
+        /* ========================================
+           Tabela de Suturas
+           ======================================== */
+        .suture-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9375rem;
+        }
+        
+        .suture-table thead {
+            background: var(--primary-800);
+            color: var(--white);
+        }
+        
+        .suture-table th {
+            padding: var(--space-sm) var(--space-md);
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.8125rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .suture-table tbody tr {
+            border-bottom: 1px solid var(--gray-200);
+            transition: background 0.1s;
+        }
+        
+        .suture-table tbody tr:hover {
+            background: var(--gray-50);
+        }
+        
+        .suture-table tbody tr.layer-group {
+            background: var(--primary-50);
+        }
+        
+        .suture-table tbody tr.layer-group td {
+            font-weight: 600;
+            color: var(--primary-800);
+            padding-top: var(--space-md);
+        }
+        
+        .suture-table td {
+            padding: var(--space-sm) var(--space-md);
+        }
+        
+        .suture-table td.layer-name {
+            font-weight: 500;
+            color: var(--gray-700);
+            min-width: 180px;
+        }
+        
+        .suture-table td .editable-combo,
+        .suture-table td input,
+        .suture-table td select {
+            width: 100%;
+        }
+        
+        .suture-table td input,
+        .suture-table td select {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.875rem;
+        }
+        
+        /* Checkbox para fechar/não fechar camada */
+        .layer-toggle {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .layer-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-600);
+        }
+        
+        .layer-toggle label {
+            font-size: 0.875rem;
+            font-weight: 400;
+            cursor: pointer;
+        }
+        
+        /* ========================================
+           Procedimentos Adicionais
+           ======================================== */
+        .procedure-checkbox {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            background: var(--gray-50);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .procedure-checkbox:hover {
+            background: var(--gray-100);
+        }
+        
+        .procedure-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-600);
+        }
+        
+        .procedure-checkbox label {
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        /* ========================================
+           Botões
+           ======================================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-lg);
+            font-family: var(--font-body);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+            color: var(--white);
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1.5px solid var(--gray-300);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gray-200);
+            border-color: var(--gray-400);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--grade-a) 0%, #1b5e20 100%);
+            color: var(--white);
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #388e3c 0%, var(--grade-a) 100%);
+        }
+        
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            margin-top: var(--space-md);
+        }
+        
+        /* Presets */
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-lg);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .preset-buttons .btn {
+            font-size: 0.8125rem;
+            padding: var(--space-xs) var(--space-md);
+        }
+        
+        /* ========================================
+           Área de Saída
+           ======================================== */
+        .output-area {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            min-height: 200px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .output-area:empty::before {
+            content: 'A descrição cirúrgica aparecerá aqui após preencher os campos e clicar em "Gerar Descrição"...';
+            color: var(--gray-400);
+            font-style: italic;
+        }
+        
+        /* ========================================
+           Tooltips de Evidência
+           ======================================== */
+        .info-tooltip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: var(--gray-200);
+            color: var(--gray-600);
+            border-radius: 50%;
+            font-size: 0.625rem;
+            font-weight: bold;
+            cursor: help;
+            margin-left: var(--space-xs);
+        }
+        
+        .info-tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gray-900);
+            color: var(--white);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 400;
+            white-space: nowrap;
+            max-width: 300px;
+            white-space: normal;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .info-tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* ========================================
+           Responsivo
+           ======================================== */
+        @media (max-width: 768px) {
+            .app-container {
+                padding: var(--space-md);
+            }
+            
+            .app-header {
+                padding: var(--space-lg) var(--space-md);
+            }
+            
+            .app-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .card-body {
+                padding: var(--space-md);
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .technique-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            .suture-table {
+                font-size: 0.8125rem;
+            }
+            
+            .suture-table th,
+            .suture-table td {
+                padding: var(--space-xs) var(--space-sm);
+            }
+        }
+        
+        /* ========================================
+           Print Styles
+           ======================================== */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .app-header,
+            .preset-buttons,
+            .btn-group,
+            .technique-selector,
+            .card:not(.output-card) {
+                display: none;
+            }
+            
+            .output-area {
+                border: none;
+                padding: 0;
+                font-family: 'Times New Roman', serif;
+                font-size: 12pt;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>Descritor Cirúrgico de Cesariana</h1>
+            <!-- ALTERAÇÃO 1: Nome do médico no subtítulo -->
+            <p>Dr. Rafael Peters | Baseado em evidências científicas atualizadas (Romero 2025, Dahlke 2013, Roberge 2016)</p>
+        </header>
+        
+        <!-- Dados da Paciente -->
+        <section class="card">
+            <div class="card-header">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <h2>Dados da Paciente</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome da Paciente</label>
+                        <input type="text" id="paciente-nome" placeholder="Nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label>Idade</label>
+                        <input type="number" id="paciente-idade" placeholder="Anos" min="10" max="60">
+                    </div>
+                    <div class="form-group">
+                        <label>Gestações (G) / Partos (P) / Cesarianas (C) / Abortos (A)</label>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-sm);">
+                            <input type="number" id="gesta" placeholder="G" min="0">
+                            <input type="number" id="para" placeholder="P" min="0">
+                            <input type="number" id="cesarea" placeholder="C" min="0">
+                            <input type="number" id="aborto" placeholder="A" min="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Idade Gestacional</label>
+                        <input type="text" id="ig" placeholder="Ex: 39 semanas">
+                    </div>
+                    <div class="form-group">
+                        <label>Data da Cirurgia</label>
+                        <input type="date" id="data-cirurgia">
+                    </div>
+                    <div class="form-group">
+                        <label>Hora de Início</label>
+                        <input type="time" id="hora-inicio">
+                    </div>
+                    <div class="form-group">
+                        <label>Indicação</label>
+                        <div class="editable-combo" data-options="Iteratividade,Apresentação pélvica,Macrossomia fetal,Sofrimento fetal agudo,Falha de indução,Cesárea a pedido,Placenta prévia,Desproporção cefalopélvica,Gestação gemelar,Prolapso de cordão,Trabalho de parto em fase ativa">
+                            <input type="text" id="indicacao" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Anestesia</label>
+                        <div class="editable-combo" data-options="Raquianestesia,Peridural,Raqui + Peridural (combinada),Anestesia geral">
+                            <input type="text" id="anestesia" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seleção de Técnica Cirúrgica -->
+        <section class="card">
+            <div class="card-header">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                </svg>
+                <h2>Técnica Cirúrgica Principal</h2>
+            </div>
+            <div class="card-body">
+                <div class="technique-selector">
+                    <label class="technique-card selected">
+                        <input type="radio" name="tecnica" value="tradicional" checked>
+                        <h3>Tradicional (Pfannenstiel-Kerr)</h3>
+                        <p>Incisão Pfannenstiel, histerotomia segmentar transversa, fechamento em dupla camada</p>
+                        <div class="tags">
+                            <span class="tag">Clássica</span>
+                            <span class="tag">Versátil</span>
+                        </div>
+                    </label>
+                    
+                    <label class="technique-card">
+                        <input type="radio" name="tecnica" value="misgav">
+                        <h3>Misgav-Ladach</h3>
+                        <p>Joel-Cohen modificada, dissecção digital, camada única, sem fechamento peritoneal</p>
+                        <div class="tags">
+                            <span class="tag">Rápida</span>
+                            <span class="tag">Menos tecido</span>
+                        </div>
+                    </label>
+                    
+                    <label class="technique-card">
+                        <input type="radio" name="tecnica" value="romero3">
+                        <h3>3 Camadas (Romero 2025)</h3>
+                        <p>Exclusão do endométrio, restauração anatômica do miométrio, cobertura serosa</p>
+                        <div class="tags">
+                            <span class="tag">Expert Review</span>
+                            <span class="tag">Menor nicho</span>
+                        </div>
+                    </label>
+                    
+                    <!-- ALTERAÇÃO 6: Novo preset Intraparto -->
+                    <label class="technique-card">
+                        <input type="radio" name="tecnica" value="intraparto">
+                        <h3>Intraparto (Segmento Fino)</h3>
+                        <p>Fechamento uterino em camada única com Vicryl 0, para segmento adelgaçado</p>
+                        <div class="tags">
+                            <span class="tag">Trabalho de parto</span>
+                            <span class="tag">Camada única</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Preparo e Antibioticoprofilaxia -->
+        <section class="card">
+            <div class="card-header">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                </svg>
+                <h2>Preparo e Profilaxia</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>
+                            Antibiótico Profilático
+                            <span class="evidence-badge evidence-a">Grau A</span>
+                            <span class="info-tooltip" data-tooltip="Administrar 15-60 minutos ANTES da incisão cutânea. Ampicilina ou cefalosporina de 1ª geração (Dahlke 2013)">?</span>
+                        </label>
+                        <div class="editable-combo" data-options="Cefazolina 2g IV,Cefazolina 3g IV (>120kg),Ampicilina 2g IV,Cefalotina 2g IV">
+                            <input type="text" id="antibiotico" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Momento da Administração
+                            <span class="evidence-badge evidence-a">Grau A</span>
+                        </label>
+                        <div class="editable-combo" data-options="30 minutos antes da incisão,15 minutos antes da incisão,60 minutos antes da incisão,Na indução anestésica">
+                            <input type="text" id="momento-atb" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Preparo da Pele
+                        </label>
+                        <div class="editable-combo" data-options="Clorexidina alcoólica 2%,Povidona iodada (PVPI) alcoólico,Clorexidina aquosa 2%,PVPI aquoso">
+                            <input type="text" id="preparo-pele" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    <!-- ALTERAÇÃO 3: Preparo vaginal com opção "Sem preparo vaginal" -->
+                    <div class="form-group">
+                        <label>
+                            Preparo Vaginal
+                            <span class="evidence-badge evidence-b">Grau B</span>
+                            <span class="info-tooltip" data-tooltip="Povidona iodada vaginal reduz endometrite (evidência moderada - Dahlke 2013)">?</span>
+                        </label>
+                        <div class="editable-combo" data-options="Sem preparo vaginal,Povidona iodada vaginal,Clorexidina vaginal,Não realizado">
+                            <input type="text" id="preparo-vaginal" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Técnica Operatória -->
+        <section class="card">
+            <div class="card-header">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <h2>Técnica Operatória</h2>
+            </div>
+            <div class="card-body">
+                <!-- Presets -->
+                <div class="preset-buttons">
+                    <span style="font-weight: 600; color: var(--gray-600); margin-right: var(--space-sm);">Presets:</span>
+                    <button type="button" class="btn btn-secondary" onclick="applyPreset('padrao')">Padrão</button>
+                    <button type="button" class="btn btn-secondary" onclick="applyPreset('rapido')">Rápido (Misgav)</button>
+                    <button type="button" class="btn btn-secondary" onclick="applyPreset('romero')">3 Camadas (Romero)</button>
+                    <button type="button" class="btn btn-secondary" onclick="applyPreset('intraparto')">Intraparto</button>
+                    <button type="button" class="btn btn-secondary" onclick="applyPreset('limpar')">Limpar Tudo</button>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Incisão Cutânea</label>
+                        <div class="editable-combo" data-options="Pfannenstiel,Joel-Cohen,Mediana infraumbilical,Transversa baixa">
+                            <input type="text" id="incisao-pele" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Abertura da Aponeurose</label>
+                        <div class="editable-combo" data-options="Incisão transversa com tesoura,Incisão transversa com bisturi,Divulsão digital">
+                            <input type="text" id="abertura-aponeurose" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- ALTERAÇÃO 7: Campo Abertura da Cavidade -->
+                    <div class="form-group">
+                        <label>Abertura da Cavidade</label>
+                        <div class="editable-combo" data-options="Sem dificuldade, sem sinais de aderências,Com dificuldade por aderências,Aderências leves - lise fácil,Aderências densas - lise laboriosa">
+                            <input type="text" id="abertura-cavidade" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- ALTERAÇÃO 4: Histerotomia com opção "Segmentar transversal alta (modificada)" -->
+                    <div class="form-group">
+                        <label>Histerotomia</label>
+                        <div class="editable-combo" data-options="Segmentar transversa baixa (Kerr),Segmentar transversal alta (modificada),Corporal clássica (vertical),Segmentar vertical,Em T invertido">
+                            <input type="text" id="histerotomia" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- ALTERAÇÃO 5: Extensão da histerotomia com "Não realizada" -->
+                    <div class="form-group">
+                        <label>
+                            Extensão da Histerotomia
+                            <span class="info-tooltip" data-tooltip="Extensão digital (blunt) em direção cefalocaudal é preferida (Dahlke 2013)">?</span>
+                        </label>
+                        <div class="editable-combo" data-options="Digital cefalocaudal (blunt),Com tesoura curva,Com bisturi,Não realizada">
+                            <input type="text" id="extensao-histerotomia" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Dequitação
+                            <span class="evidence-badge evidence-a">Grau A</span>
+                            <span class="info-tooltip" data-tooltip="Dequitação ESPONTÂNEA - menor perda sanguínea e infecção (Dahlke 2013). Evitar remoção manual.">?</span>
+                        </label>
+                        <div class="editable-combo" data-options="Espontânea (aguardar descolamento),Espontânea com tração controlada do cordão,Manual (quando indicado)">
+                            <input type="text" id="dequitacao" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Exteriorização Uterina
+                            <span class="evidence-badge evidence-c">Grau C</span>
+                        </label>
+                        <div class="editable-combo" data-options="Sim - exteriorizado para sutura,Não - sutura in situ">
+                            <input type="text" id="exteriorizacao" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- ALTERAÇÃO 8: Campo Descrição da Cavidade -->
+                    <div class="form-group full-width">
+                        <label>Descrição da Cavidade</label>
+                        <textarea id="descricao-cavidade" placeholder="Descrever achados da cavidade abdominal, anexos, útero..." rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- ALTERAÇÃO 9: Procedimentos Adicionais -->
+        <section class="card">
+            <div class="card-header">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                <h2>Procedimentos Adicionais</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <div class="procedure-checkbox">
+                        <input type="checkbox" id="ligadura-tubaria">
+                        <label for="ligadura-tubaria">Ligadura tubária por salpingectomia bilateral</label>
+                    </div>
+                    <div class="procedure-checkbox">
+                        <input type="checkbox" id="outro-procedimento">
+                        <label for="outro-procedimento">Outro procedimento</label>
+                    </div>
+                </div>
+                <div class="form-group full-width" style="margin-top: var(--space-md);" id="outro-procedimento-campo" style="display: none;">
+                    <label>Descrever procedimento adicional</label>
+                    <textarea id="outro-procedimento-descricao" placeholder="Descrever o procedimento adicional realizado..." rows="2"></textarea>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Tabela de Suturas -->
+        <section class="card">
+            <div class="card-header">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                </svg>
+                <h2>Fechamento por Camadas</h2>
+            </div>
+            <div class="card-body" style="overflow-x: auto;">
+                <table class="suture-table" id="suture-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 200px;">Camada</th>
+                            <th style="width: 200px;">Fio</th>
+                            <th style="width: 180px;">Técnica</th>
+                            <th style="width: 120px;">Fechar?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Útero -->
+                        <tr class="layer-group">
+                            <td colspan="4">ÚTERO</td>
+                        </tr>
+                        <!-- ALTERAÇÃO 10: Fios corrigidos para fechamento em 3 camadas -->
+                        <tr data-layer="miometrio1">
+                            <td class="layer-name">
+                                Miométrio 1ª camada
+                                <span class="evidence-badge evidence-b" style="display: block; margin-top: 4px;">Excluir endométrio</span>
+                            </td>
+                            <td>
+                                <div class="editable-combo" data-options="Vicryl 0,Vicryl 00,Vicryl 1-0,Monocryl 0,Catgut cromado 1">
+                                    <input type="text" class="fio-input" placeholder="Fio">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="editable-combo" data-options="Contínua não ancorada (unlocked),Contínua ancorada (locked),Pontos separados">
+                                    <input type="text" class="tecnica-input" placeholder="Técnica">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="layer-toggle">
+                                    <input type="checkbox" checked id="fechar-miometrio1">
+                                    <label for="fechar-miometrio1">Sim</label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-layer="miometrio2">
+                            <td class="layer-name">Miométrio 2ª camada</td>
+                            <td>
+                                <div class="editable-combo" data-options="Vicryl 0,Vicryl 00,Vicryl 2-0,Vicryl 1-0,Monocryl 2-0,Não aplicável">
+                                    <input type="text" class="fio-input" placeholder="Fio">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="editable-combo" data-options="Contínua não ancorada,Pontos separados imbricantes,Não realizada">
+                                    <input type="text" class="tecnica-input" placeholder="Técnica">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="layer-toggle">
+                                    <input type="checkbox" checked id="fechar-miometrio2">
+                                    <label for="fechar-miometrio2">Sim</label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-layer="miometrio3" style="display: none;">
+                            <td class="layer-name">
+                                Miométrio 3ª camada (serosa)
+                                <span class="evidence-badge evidence-b" style="display: block; margin-top: 4px;">Romero 2025</span>
+                            </td>
+                            <td>
+                                <div class="editable-combo" data-options="Vicryl 00,Vicryl 3-0,Vicryl 2-0,Monocryl 3-0">
+                                    <input type="text" class="fio-input" placeholder="Fio">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="editable-combo" data-options="Contínua cobertura serosa,Pontos separados serosa">
+                                    <input type="text" class="tecnica-input" placeholder="Técnica">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="layer-toggle">
+                                    <input type="checkbox" checked id="fechar-miometrio3">
+                                    <label for="fechar-miometrio3">Sim</label>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Peritônio -->
+                        <tr class="layer-group">
+                            <td colspan="4">PERITÔNIO</td>
+                        </tr>
+                        <tr data-layer="peritonio-visceral">
+                            <td class="layer-name">Peritônio visceral</td>
+                            <td>
+                                <div class="editable-combo" data-options="Vicryl 2-0,Catgut simples 2-0,Não fechado">
+                                    <input type="text" class="fio-input" placeholder="Fio">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="editable-combo" data-options="Contínua,Pontos separados,Não fechado">
+                                    <input type="text" class="tecnica-input" placeholder="Técnica">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="layer-toggle">
+                                    <input type="checkbox" id="fechar-peritonio-visceral">
+                                    <label for="fechar-peritonio-visceral">Sim</label>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- ALTERAÇÃO 11: Peritônio parietal NÃO fechado por padrão -->
+                        <tr data-layer="peritonio-parietal">
+                            <td class="layer-name">Peritônio parietal</td>
+                            <td>
+                                <div class="editable-combo" data-options="Não fechado,Vicryl 2-0,Catgut simples 2-0">
+                                    <input type="text" class="fio-input" placeholder="Fio">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="editable-combo" data-options="Não fechado,Contínua,Pontos separados">
+                                    <input type="text" class="tecnica-input" placeholder="Técnica">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="layer-toggle">
+                                    <input type="checkbox" id="fechar-peritonio-parietal">
+                                    <label for="fechar-peritonio-parietal">Sim</label>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Parede Abdominal -->
+                        <tr class="layer-group">
+                            <td colspan="4">PAREDE ABDOMINAL</td>
+                        </tr>
+                        <!-- ALTERAÇÃO 12: Retos abdominais reaproximados com cromado/vicryl 0 -->
+                        <tr data-layer="musculos">
+                            <td class="layer-name">Músculos retos</td>
+                            <td>
+                                <div class="editable-combo" data-options="Catgut cromado 0,Vicryl 0,Não suturados (reaproximação),Vicryl 2-0">
+                                    <input type="text" class="fio-input" placeholder="Fio">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="editable-combo" data-options="Sutura contínua,Reaproximação sem sutura,Pontos separados">
+                                    <input type="text" class="tecnica-input" placeholder="Técnica">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="layer-toggle">
+                                    <input type="checkbox" checked id="fechar-musculos">
+                                    <label for="fechar-musculos">Sim</label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-layer="aponeurose">
+                            <td class="layer-name">Aponeurose</td>
+                            <td>
+                                <div class="editable-combo" data-options="Vicryl 1,Vicryl 0,PDS 1,Nylon 0">
+                                    <input type="text" class="fio-input" placeholder="Fio">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="editable-combo" data-options="Contínua,Pontos separados">
+                                    <input type="text" class="tecnica-input" placeholder="Técnica">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="layer-toggle">
+                                    <input type="checkbox" checked id="fechar-aponeurose">
+                                    <label for="fechar-aponeurose">Sim</label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-layer="subcutaneo">
+                            <td class="layer-name">
+                                Subcutâneo
+                                <span class="evidence-badge evidence-a" style="display: block; margin-top: 4px;">Fechar se ≥2cm</span>
+                            </td>
+                            <td>
+                                <div class="editable-combo" data-options="Vicryl 3-0,Vicryl 2-0,Catgut simples 3-0,Não fechado">
+                                    <input type="text" class="fio-input" placeholder="Fio">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="editable-combo" data-options="Pontos separados,Contínua,Não fechado">
+                                    <input type="text" class="tecnica-input" placeholder="Técnica">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="layer-toggle">
+                                    <input type="checkbox" checked id="fechar-subcutaneo">
+                                    <label for="fechar-subcutaneo">Sim</label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-layer="pele">
+                            <td class="layer-name">Pele</td>
+                            <td>
+                                <div class="editable-combo" data-options="Monocryl 4-0,Nylon 4-0,Grampos,Vicryl rapide 4-0">
+                                    <input type="text" class="fio-input" placeholder="Fio">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="editable-combo" data-options="Intradérmica contínua,Pontos separados,Grampos metálicos">
+                                    <input type="text" class="tecnica-input" placeholder="Técnica">
+                                    <button type="button" class="dropdown-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-list"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="layer-toggle">
+                                    <input type="checkbox" checked id="fechar-pele">
+                                    <label for="fechar-pele">Sim</label>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- Dados do RN e Intercorrências -->
+        <section class="card">
+            <div class="card-header">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <h2>Dados do RN e Intercorrências</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Peso do RN</label>
+                        <input type="text" id="peso-rn" placeholder="Ex: 3.250g">
+                    </div>
+                    <div class="form-group">
+                        <label>Apgar</label>
+                        <input type="text" id="apgar" placeholder="Ex: 9/10">
+                    </div>
+                    <div class="form-group">
+                        <label>Sexo do RN</label>
+                        <select id="sexo-rn">
+                            <option value="">Selecione</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="feminino">Feminino</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Líquido Amniótico</label>
+                        <div class="editable-combo" data-options="Claro,Meconial fluido,Meconial espesso,Sanguinolento,Oligoâmnio,Polidrâmnio">
+                            <input type="text" id="liquido-amniotico" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Perda Sanguínea Estimada</label>
+                        <div class="editable-combo" data-options="500-700mL (habitual),<500mL,700-1000mL,>1000mL (hemorragia)">
+                            <input type="text" id="perda-sanguinea" placeholder="Selecione ou digite">
+                            <button type="button" class="dropdown-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-list"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Hora do Nascimento</label>
+                        <input type="time" id="hora-nascimento">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Intercorrências</label>
+                        <textarea id="intercorrencias" placeholder="Descrever intercorrências se houver..." rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Botões de Ação -->
+        <section class="card">
+            <div class="card-body">
+                <div class="btn-group" style="justify-content: center;">
+                    <button type="button" class="btn btn-primary" onclick="gerarDescricao()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                        </svg>
+                        Gerar Descrição
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="copiarDescricao()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                        </svg>
+                        Copiar
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Área de Saída -->
+        <section class="card output-card">
+            <div class="card-header">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <path d="M14 2v6h6"/>
+                </svg>
+                <h2>Descrição Cirúrgica Gerada</h2>
+            </div>
+            <div class="card-body">
+                <div class="output-area" id="output"></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // ========================================
+        // Combobox Editável
+        // ========================================
+        document.querySelectorAll('.editable-combo').forEach(combo => {
+            const input = combo.querySelector('input');
+            const btn = combo.querySelector('.dropdown-btn');
+            const list = combo.querySelector('.dropdown-list');
+            const options = combo.dataset.options?.split(',') || [];
+            
+            // Criar opções
+            options.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.textContent = opt.trim();
+                div.addEventListener('click', () => {
+                    input.value = opt.trim();
+                    combo.classList.remove('open');
+                    input.dispatchEvent(new Event('change'));
+                });
+                list.appendChild(div);
+            });
+            
+            // Toggle dropdown
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Fechar outros dropdowns
+                document.querySelectorAll('.editable-combo.open').forEach(c => {
+                    if (c !== combo) c.classList.remove('open');
+                });
+                combo.classList.toggle('open');
+            });
+            
+            // Fechar ao clicar fora
+            document.addEventListener('click', (e) => {
+                if (!combo.contains(e.target)) {
+                    combo.classList.remove('open');
+                }
+            });
+            
+            // Filtrar opções ao digitar
+            input.addEventListener('input', () => {
+                const filter = input.value.toLowerCase();
+                list.querySelectorAll('.option').forEach(opt => {
+                    const match = opt.textContent.toLowerCase().includes(filter);
+                    opt.style.display = match ? 'block' : 'none';
+                });
+            });
+        });
+        
+        // ========================================
+        // Seleção de Técnica Cirúrgica
+        // Ao selecionar uma técnica, aplica automaticamente o preset correspondente
+        // ========================================
+        document.querySelectorAll('.technique-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const tecnica = card.querySelector('input[type="radio"]').value;
+                
+                // Mapear técnica para preset correspondente
+                const tecnicaParaPreset = {
+                    'tradicional': 'padrao',
+                    'misgav': 'rapido',
+                    'romero3': 'romero',
+                    'intraparto': 'intraparto'
+                };
+                
+                // Aplicar preset correspondente (isso já faz a seleção visual e preenche campos)
+                const presetCorrespondente = tecnicaParaPreset[tecnica];
+                if (presetCorrespondente) {
+                    applyPreset(presetCorrespondente);
+                }
+            });
+        });
+        
+        // ========================================
+        // Mostrar/ocultar campo de outro procedimento
+        // ========================================
+        document.getElementById('outro-procedimento').addEventListener('change', function() {
+            const campo = document.getElementById('outro-procedimento-campo');
+            campo.style.display = this.checked ? 'block' : 'none';
+        });
+        
+        // ========================================
+        // Presets
+        // ========================================
+        function applyPreset(preset) {
+            const presets = {
+                padrao: {
+                    tecnica: 'tradicional',
+                    antibiotico: 'Cefazolina 2g IV',
+                    momentoAtb: '30 minutos antes da incisão',
+                    preparoPele: 'Clorexidina alcoólica 2%',
+                    preparoVaginal: 'Povidona iodada vaginal',
+                    incisaoPele: 'Pfannenstiel',
+                    aberturaAponeurose: 'Incisão transversa com tesoura',
+                    aberturaCavidade: 'Sem dificuldade, sem sinais de aderências',
+                    histerotomia: 'Segmentar transversa baixa (Kerr)',
+                    extensaoHisterotomia: 'Digital cefalocaudal (blunt)',
+                    dequitacao: 'Espontânea (aguardar descolamento)',
+                    exteriorizacao: 'Sim - exteriorizado para sutura',
+                    suturas: {
+                        'miometrio1': { fio: 'Vicryl 0', tecnica: 'Contínua não ancorada (unlocked)', fechar: true },
+                        'miometrio2': { fio: 'Vicryl 0', tecnica: 'Contínua não ancorada', fechar: true },
+                        'peritonio-visceral': { fio: 'Vicryl 2-0', tecnica: 'Contínua', fechar: true },
+                        'peritonio-parietal': { fio: 'Não fechado', tecnica: 'Não fechado', fechar: false },
+                        'musculos': { fio: 'Catgut cromado 0', tecnica: 'Sutura contínua', fechar: true },
+                        'aponeurose': { fio: 'Vicryl 1', tecnica: 'Contínua', fechar: true },
+                        'subcutaneo': { fio: 'Vicryl 3-0', tecnica: 'Pontos separados', fechar: true },
+                        'pele': { fio: 'Monocryl 4-0', tecnica: 'Intradérmica contínua', fechar: true }
+                    }
+                },
+                rapido: {
+                    tecnica: 'misgav',
+                    antibiotico: 'Cefazolina 2g IV',
+                    momentoAtb: '30 minutos antes da incisão',
+                    preparoPele: 'Clorexidina alcoólica 2%',
+                    preparoVaginal: 'Sem preparo vaginal',
+                    incisaoPele: 'Joel-Cohen',
+                    aberturaAponeurose: 'Divulsão digital',
+                    aberturaCavidade: 'Sem dificuldade, sem sinais de aderências',
+                    histerotomia: 'Segmentar transversa baixa (Kerr)',
+                    extensaoHisterotomia: 'Digital cefalocaudal (blunt)',
+                    dequitacao: 'Espontânea com tração controlada do cordão',
+                    exteriorizacao: 'Sim - exteriorizado para sutura',
+                    suturas: {
+                        'miometrio1': { fio: 'Vicryl 0', tecnica: 'Contínua ancorada (locked)', fechar: true },
+                        'miometrio2': { fio: 'Não aplicável', tecnica: 'Não realizada', fechar: false },
+                        'peritonio-visceral': { fio: 'Não fechado', tecnica: 'Não fechado', fechar: false },
+                        'peritonio-parietal': { fio: 'Não fechado', tecnica: 'Não fechado', fechar: false },
+                        'musculos': { fio: 'Catgut cromado 0', tecnica: 'Sutura contínua', fechar: true },
+                        'aponeurose': { fio: 'Vicryl 1', tecnica: 'Contínua', fechar: true },
+                        'subcutaneo': { fio: 'Não fechado', tecnica: 'Não fechado', fechar: false },
+                        'pele': { fio: 'Monocryl 4-0', tecnica: 'Intradérmica contínua', fechar: true }
+                    }
+                },
+                romero: {
+                    tecnica: 'romero3',
+                    antibiotico: 'Cefazolina 2g IV',
+                    momentoAtb: '30 minutos antes da incisão',
+                    preparoPele: 'Clorexidina alcoólica 2%',
+                    preparoVaginal: 'Povidona iodada vaginal',
+                    incisaoPele: 'Pfannenstiel',
+                    aberturaAponeurose: 'Incisão transversa com tesoura',
+                    aberturaCavidade: 'Sem dificuldade, sem sinais de aderências',
+                    histerotomia: 'Segmentar transversa baixa (Kerr)',
+                    extensaoHisterotomia: 'Digital cefalocaudal (blunt)',
+                    dequitacao: 'Espontânea (aguardar descolamento)',
+                    exteriorizacao: 'Sim - exteriorizado para sutura',
+                    suturas: {
+                        // ALTERAÇÃO 10: Fios para 3 camadas - 1ª vicryl 00, 2ª vicryl 0, 3ª vicryl 00
+                        'miometrio1': { fio: 'Vicryl 00', tecnica: 'Contínua não ancorada (unlocked)', fechar: true },
+                        'miometrio2': { fio: 'Vicryl 0', tecnica: 'Contínua não ancorada', fechar: true },
+                        'miometrio3': { fio: 'Vicryl 00', tecnica: 'Contínua cobertura serosa', fechar: true },
+                        'peritonio-visceral': { fio: 'Vicryl 2-0', tecnica: 'Contínua', fechar: true },
+                        'peritonio-parietal': { fio: 'Não fechado', tecnica: 'Não fechado', fechar: false },
+                        'musculos': { fio: 'Catgut cromado 0', tecnica: 'Sutura contínua', fechar: true },
+                        'aponeurose': { fio: 'Vicryl 1', tecnica: 'Contínua', fechar: true },
+                        'subcutaneo': { fio: 'Vicryl 3-0', tecnica: 'Pontos separados', fechar: true },
+                        'pele': { fio: 'Monocryl 4-0', tecnica: 'Intradérmica contínua', fechar: true }
+                    }
+                },
+                // ALTERAÇÃO 6: Preset Intraparto (segmento fino)
+                intraparto: {
+                    tecnica: 'intraparto',
+                    antibiotico: 'Cefazolina 2g IV',
+                    momentoAtb: '30 minutos antes da incisão',
+                    preparoPele: 'Clorexidina alcoólica 2%',
+                    preparoVaginal: 'Povidona iodada vaginal',
+                    incisaoPele: 'Pfannenstiel',
+                    aberturaAponeurose: 'Incisão transversa com tesoura',
+                    aberturaCavidade: 'Sem dificuldade, sem sinais de aderências',
+                    histerotomia: 'Segmentar transversa baixa (Kerr)',
+                    extensaoHisterotomia: 'Digital cefalocaudal (blunt)',
+                    dequitacao: 'Espontânea (aguardar descolamento)',
+                    exteriorizacao: 'Sim - exteriorizado para sutura',
+                    suturas: {
+                        'miometrio1': { fio: 'Vicryl 0', tecnica: 'Contínua não ancorada (unlocked)', fechar: true },
+                        'miometrio2': { fio: 'Não aplicável', tecnica: 'Não realizada', fechar: false },
+                        'peritonio-visceral': { fio: 'Não fechado', tecnica: 'Não fechado', fechar: false },
+                        'peritonio-parietal': { fio: 'Não fechado', tecnica: 'Não fechado', fechar: false },
+                        'musculos': { fio: 'Catgut cromado 0', tecnica: 'Sutura contínua', fechar: true },
+                        'aponeurose': { fio: 'Vicryl 1', tecnica: 'Contínua', fechar: true },
+                        'subcutaneo': { fio: 'Vicryl 3-0', tecnica: 'Pontos separados', fechar: true },
+                        'pele': { fio: 'Monocryl 4-0', tecnica: 'Intradérmica contínua', fechar: true }
+                    }
+                }
+            };
+            
+            if (preset === 'limpar') {
+                document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], input[type="time"], textarea').forEach(el => el.value = '');
+                document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+                document.getElementById('output').textContent = '';
+                document.getElementById('ligadura-tubaria').checked = false;
+                document.getElementById('outro-procedimento').checked = false;
+                document.getElementById('outro-procedimento-campo').style.display = 'none';
+                return;
+            }
+            
+            const p = presets[preset];
+            if (!p) return;
+            
+            // Selecionar técnica visualmente (sem chamar click para evitar loop)
+            document.querySelectorAll('.technique-card').forEach(card => {
+                const radio = card.querySelector('input[type="radio"]');
+                if (radio.value === p.tecnica) {
+                    document.querySelectorAll('.technique-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    radio.checked = true;
+                }
+            });
+            
+            // Mostrar/ocultar 3ª camada baseado na técnica
+            const miometrio3Row = document.querySelector('tr[data-layer="miometrio3"]');
+            if (p.tecnica === 'romero3') {
+                miometrio3Row.style.display = 'table-row';
+            } else {
+                miometrio3Row.style.display = 'none';
+            }
+            
+            // Preencher campos
+            document.getElementById('antibiotico').value = p.antibiotico;
+            document.getElementById('momento-atb').value = p.momentoAtb;
+            document.getElementById('preparo-pele').value = p.preparoPele;
+            document.getElementById('preparo-vaginal').value = p.preparoVaginal;
+            document.getElementById('incisao-pele').value = p.incisaoPele;
+            document.getElementById('abertura-aponeurose').value = p.aberturaAponeurose;
+            document.getElementById('abertura-cavidade').value = p.aberturaCavidade;
+            document.getElementById('histerotomia').value = p.histerotomia;
+            document.getElementById('extensao-histerotomia').value = p.extensaoHisterotomia;
+            document.getElementById('dequitacao').value = p.dequitacao;
+            document.getElementById('exteriorizacao').value = p.exteriorizacao;
+            
+            // Preencher tabela de suturas
+            Object.entries(p.suturas).forEach(([layer, data]) => {
+                const row = document.querySelector(`tr[data-layer="${layer}"]`);
+                if (row) {
+                    row.querySelector('.fio-input').value = data.fio;
+                    row.querySelector('.tecnica-input').value = data.tecnica;
+                    const checkbox = row.querySelector('input[type="checkbox"]');
+                    if (checkbox) checkbox.checked = data.fechar;
+                }
+            });
+        }
+        
+        // ========================================
+        // Geração da Descrição Cirúrgica
+        // ========================================
+        function gerarDescricao() {
+            const val = (id) => document.getElementById(id)?.value || '';
+            const checked = (id) => document.getElementById(id)?.checked;
+            
+            // Dados básicos
+            const nome = val('paciente-nome') || '[NOME]';
+            const idade = val('paciente-idade') || '[IDADE]';
+            const g = val('gesta') || '?';
+            const p = val('para') || '?';
+            const c = val('cesarea') || '?';
+            const a = val('aborto') || '?';
+            const ig = val('ig') || '[IG]';
+            const data = val('data-cirurgia') ? new Date(val('data-cirurgia')).toLocaleDateString('pt-BR') : '[DATA]';
+            const horaInicio = val('hora-inicio') || '[HORA]';
+            const indicacao = val('indicacao') || '[INDICAÇÃO]';
+            const anestesia = val('anestesia') || '[ANESTESIA]';
+            
+            // Preparo
+            const antibiotico = val('antibiotico') || '[ANTIBIÓTICO]';
+            const momentoAtb = val('momento-atb') || '[MOMENTO]';
+            const preparoPele = val('preparo-pele') || '[PREPARO PELE]';
+            const preparoVaginal = val('preparo-vaginal');
+            
+            // Técnica
+            const tecnicaSelecionada = document.querySelector('input[name="tecnica"]:checked')?.value || 'tradicional';
+            const incisaoPele = val('incisao-pele') || '[INCISÃO]';
+            const aberturaAponeurose = val('abertura-aponeurose') || '[ABERTURA]';
+            const aberturaCavidade = val('abertura-cavidade') || '';
+            const histerotomia = val('histerotomia') || '[HISTEROTOMIA]';
+            const extensaoHisterotomia = val('extensao-histerotomia') || '[EXTENSÃO]';
+            const dequitacao = val('dequitacao') || '[DEQUITAÇÃO]';
+            const exteriorizacao = val('exteriorizacao') || '[EXTERIORIZAÇÃO]';
+            const descricaoCavidade = val('descricao-cavidade');
+            
+            // Procedimentos adicionais
+            const ligaduraTubaria = checked('ligadura-tubaria');
+            const outroProcedimento = checked('outro-procedimento');
+            const outroProcedimentoDesc = val('outro-procedimento-descricao');
+            
+            // RN
+            const pesoRn = val('peso-rn') || '[PESO]';
+            const apgar = val('apgar') || '[APGAR]';
+            const sexoRn = val('sexo-rn') || '[SEXO]';
+            const liquidoAmniotico = val('liquido-amniotico') || '[LA]';
+            const perdaSanguinea = val('perda-sanguinea') || '[PERDA]';
+            const horaNascimento = val('hora-nascimento') || '[HORA NASC]';
+            const intercorrencias = val('intercorrencias');
+            
+            // Coletar suturas
+            const suturas = [];
+            document.querySelectorAll('#suture-table tbody tr[data-layer]').forEach(row => {
+                if (row.style.display === 'none') return;
+                
+                const layer = row.dataset.layer;
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                const fechar = checkbox?.checked;
+                
+                if (!fechar) return;
+                
+                const fio = row.querySelector('.fio-input')?.value || '';
+                const tecnica = row.querySelector('.tecnica-input')?.value || '';
+                
+                if (fio && tecnica && !fio.includes('Não') && !tecnica.includes('Não')) {
+                    const nomeCamada = row.querySelector('.layer-name')?.textContent.split('\n')[0].trim() || layer;
+                    suturas.push(`${nomeCamada}: ${fio}, ${tecnica}`);
+                }
+            });
+            
+            // Montar descrição
+            let desc = `DESCRIÇÃO CIRÚRGICA - CESARIANA
+
+IDENTIFICAÇÃO
+Paciente: ${nome}, ${idade} anos
+Paridade: G${g}P${p}C${c}A${a}
+Idade Gestacional: ${ig}
+Data: ${data}
+Indicação: ${indicacao}
+
+ANESTESIA
+${anestesia}
+
+ANTIBIOTICOPROFILAXIA
+${antibiotico}, administrado ${momentoAtb}
+
+PREPARO
+Antissepsia da pele com ${preparoPele}`;
+
+            if (preparoVaginal && !preparoVaginal.includes('Não') && !preparoVaginal.includes('Sem preparo')) {
+                desc += `\nPreparo vaginal com ${preparoVaginal}`;
+            }
+
+            const tecnicaNome = {
+                'tradicional': 'Técnica Tradicional (Pfannenstiel-Kerr)',
+                'misgav': 'Técnica Misgav-Ladach',
+                'romero3': 'Técnica 3 Camadas (Romero 2025)',
+                'intraparto': 'Técnica Intraparto (Segmento Fino - Camada Única)'
+            };
+
+            desc += `
+
+TÉCNICA OPERATÓRIA
+${tecnicaNome[tecnicaSelecionada]}
+
+Incisão cutânea: ${incisaoPele}
+Abertura da aponeurose: ${aberturaAponeurose}`;
+
+            if (aberturaCavidade) {
+                desc += `\nAbertura da cavidade: ${aberturaCavidade}`;
+            }
+
+            desc += `
+Histerotomia: ${histerotomia}
+Extensão da histerotomia: ${extensaoHisterotomia}
+Extração fetal em apresentação adequada
+Dequitação: ${dequitacao}
+Exteriorização uterina: ${exteriorizacao}`;
+
+            if (descricaoCavidade) {
+                desc += `\n\nDESCRIÇÃO DA CAVIDADE\n${descricaoCavidade}`;
+            }
+
+            // Procedimentos adicionais
+            if (ligaduraTubaria || outroProcedimento) {
+                desc += `\n\nPROCEDIMENTOS ADICIONAIS`;
+                if (ligaduraTubaria) {
+                    desc += `\nLigadura tubária por salpingectomia bilateral`;
+                }
+                if (outroProcedimento && outroProcedimentoDesc) {
+                    desc += `\n${outroProcedimentoDesc}`;
+                }
+            }
+
+            desc += `
+
+FECHAMENTO POR CAMADAS
+${suturas.join('\n')}
+
+DADOS DO RECÉM-NASCIDO
+Hora do nascimento: ${horaNascimento}
+Sexo: ${sexoRn}
+Peso: ${pesoRn}
+Apgar: ${apgar}
+Líquido amniótico: ${liquidoAmniotico}
+
+EVOLUÇÃO
+Perda sanguínea estimada: ${perdaSanguinea}`;
+
+            if (intercorrencias) {
+                desc += `\nIntercorrências: ${intercorrencias}`;
+            } else {
+                desc += `\nSem intercorrências.`;
+            }
+
+            // Referências bibliográficas por técnica
+            const referencias = {
+                'tradicional': 'Técnica clássica Pfannenstiel-Kerr. Ref: ACOG Practice Bulletin No. 205, 2019.',
+                'misgav': 'Ref: Holmgren G, et al. The Misgav Ladach method for cesarean section. Acta Obstet Gynecol Scand. 1999;78(7):615-21.',
+                'romero3': 'Ref: Romero R, et al. Three-layer uterine closure at cesarean section. Am J Obstet Gynecol. 2025.',
+                'intraparto': 'Técnica para segmento adelgaçado em trabalho de parto. Ref: NICE Guidelines - Caesarean Birth, 2021.'
+            };
+
+            // ALTERAÇÃO 1: Assinatura com nome do médico e referência da técnica
+            desc += `
+
+Procedimento concluído sem intercorrências.
+Paciente encaminhada à recuperação em bom estado geral.
+
+${referencias[tecnicaSelecionada] || ''}
+
+____________________________________
+DR. Rafael Peters
+CREMERS 19676`;
+
+            document.getElementById('output').textContent = desc;
+        }
+        
+        // ========================================
+        // Copiar para Área de Transferência
+        // ========================================
+        function copiarDescricao() {
+            const output = document.getElementById('output');
+            if (!output.textContent) {
+                alert('Gere a descrição primeiro.');
+                return;
+            }
+            
+            navigator.clipboard.writeText(output.textContent).then(() => {
+                const btn = event.target.closest('.btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><polyline points="20 6 9 17 4 12"/></svg> Copiado!';
+                setTimeout(() => btn.innerHTML = originalText, 2000);
+            }).catch(err => {
+                console.error('Erro ao copiar:', err);
+                alert('Erro ao copiar. Selecione o texto manualmente.');
+            });
+        }
+        
+        // ========================================
+        // Inicialização
+        // ========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Definir data atual
+            const hoje = new Date().toISOString().split('T')[0];
+            document.getElementById('data-cirurgia').value = hoje;
+            
+            // Aplicar preset padrão
+            applyPreset('padrao');
+        });
+    </script>
+</body>
+</html>
