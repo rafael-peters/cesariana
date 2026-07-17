@@ -43,6 +43,11 @@ Quem abrir o link pode usar direto ou baixar o arquivo para uso offline (Ctrl+S)
 | `index.html` | **Aplicativo completo** (offline = online, mesmo arquivo) |
 | `arquivo/` | Versões anteriores (referência histórica) |
 | `Tecnicas_Cesariana_Sintese_Evidencias.docx` | Síntese de evidências das técnicas |
+| `CLAUDE.md` | Notas técnicas e restrições do projeto (para desenvolvedores/manutenção) |
+
+## 🛠️ Para quem for editar o código
+
+Tudo vive em **`index.html`** (HTML + CSS + JS inline). Antes de mexer, leia o **`CLAUDE.md`** — ele lista as restrições que não podem ser quebradas: zero recursos externos (senão perde o offline), compatibilidade com `file://` e navegadores antigos, parse de datas à prova de fuso horário, e a regra de não persistir dados de paciente (LGPD). O conteúdo clínico (opções e doses) fica nos objetos `CONFIG_PADRAO.listas` e `TECNICAS`, editável também pela aba Configurações.
 
 ## 📚 Bases de evidência
 
