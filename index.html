@@ -80,6 +80,17 @@ svg{flex-shrink:0}
 .pt-banner.empty .pt-nome{color:var(--c-warning);font-weight:600}
 .btn-nova{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:1.5px solid var(--c-danger);background:transparent;color:var(--c-danger);border-radius:var(--r-pill);font-size:.82rem;font-weight:600;cursor:pointer;transition:all var(--dur) var(--ease)}
 .btn-nova:hover{background:var(--c-danger);color:#fff}
+/* faixa de alergias — sempre visível, em todas as abas */
+.pt-alergias{display:none;width:100%;background:var(--c-danger-bg);border-top:1px solid var(--c-danger);color:var(--c-danger);font-size:.86rem;font-weight:700;padding:6px 16px;align-items:center;gap:8px;line-height:1.35}
+.pt-alergias.show{display:flex}
+.pt-alergias.negado{background:var(--c-success-bg);border-top-color:var(--c-success);color:var(--c-success);font-weight:600}
+.pt-alergias .al-lista{font-weight:800;letter-spacing:.01em}
+.pt-alergias.negado .al-lista{font-weight:600}
+.card-alergia{border:2px solid var(--c-danger)}
+.card-alergia .card-header{color:var(--c-danger)}
+:root[data-theme="dark"] .card-alergia .card-header{color:#ff8a80}
+:root[data-theme="dark"] .pt-alergias{color:#ff8a80}
+:root[data-theme="dark"] .pt-alergias.negado{color:#7fd694}
 
 /* ============ CARDS ============ */
 .card{background:var(--c-surface);border:1px solid var(--c-line);border-radius:var(--r-md);margin-bottom:14px;box-shadow:var(--shadow-sm);overflow:visible}
@@ -300,6 +311,10 @@ input[type="checkbox"]{width:17px;height:17px;cursor:pointer;accent-color:var(--
       Nova paciente
     </button>
   </div>
+  <div class="pt-alergias" id="ptAlergiasBar">
+    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 9v5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>
+    <span id="ptAlergiasTexto" class="al-lista"></span>
+  </div>
 </div>
 <main>
 <section class="tab-content active" id="tab-plano">
@@ -344,6 +359,46 @@ input[type="checkbox"]{width:17px;height:17px;cursor:pointer;accent-color:var(--
         </div>
         <div class="form-group"><label for="pt-convenio">Convênio / autorização</label><input id="pt-convenio" placeholder="ex: Unimed — guia 123456"></div>
       </div>
+    </div>
+  </div>
+
+  <div class="card card-alergia" id="card-pt-alergias">
+    <button type="button" class="card-header" onclick="toggleCard(this)">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 9v5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>
+      Alergias e Atopias <span class="hint">(destacado no banner e em todos os documentos)</span>
+      <span class="resumo"></span><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="card-body">
+      <div class="check-row" style="background:var(--c-success-bg);padding:9px 12px;border-radius:var(--r-sm);margin-bottom:12px">
+        <input type="checkbox" id="pt-nega-alergia" onchange="alergiaMudou()">
+        <label for="pt-nega-alergia"><b>Nega alergias e atopias</b> <span class="hint">— registra a negativa ativa no documento</span></label>
+      </div>
+      <div class="form-grid">
+        <div class="form-group fw"><label for="pt-alergias">Alergias medicamentosas <span class="hint">(separe por vírgula — ex.: diclofenaco, paracetamol, sulfa)</span></label><input id="pt-alergias" oninput="alergiaMudou()" placeholder="Liste todos os fármacos"></div>
+      </div>
+      <p style="font-weight:700;font-size:.83rem;margin:12px 0 5px">Alergias de impacto cirúrgico <span class="hint">(alteram preparo de sala, antissepsia ou anestesia)</span></p>
+      <div class="form-grid" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr))">
+        <div class="check-row"><input type="checkbox" id="pt-al-latex" onchange="alergiaMudou()"><label for="pt-al-latex">Látex</label></div>
+        <div class="check-row"><input type="checkbox" id="pt-al-antisseptico" onchange="alergiaMudou()"><label for="pt-al-antisseptico">Antisséptico (clorexidina / iodo)</label></div>
+        <div class="check-row"><input type="checkbox" id="pt-al-anestesico" onchange="alergiaMudou()"><label for="pt-al-anestesico">Anestésico local</label></div>
+        <div class="check-row"><input type="checkbox" id="pt-al-cefalo2" onchange="alergiaMudou()"><label for="pt-al-cefalo2">Cefalosporina / penicilina</label></div>
+        <div class="check-row"><input type="checkbox" id="pt-al-dipirona2" onchange="alergiaMudou()"><label for="pt-al-dipirona2">Dipirona</label></div>
+        <div class="check-row"><input type="checkbox" id="pt-al-aine2" onchange="alergiaMudou()"><label for="pt-al-aine2">AINE</label></div>
+        <div class="check-row"><input type="checkbox" id="pt-al-paracetamol" onchange="alergiaMudou()"><label for="pt-al-paracetamol">Paracetamol</label></div>
+        <div class="check-row"><input type="checkbox" id="pt-al-opioide2" onchange="alergiaMudou()"><label for="pt-al-opioide2">Opioide</label></div>
+      </div>
+      <p style="font-weight:700;font-size:.83rem;margin:12px 0 5px">Atopias</p>
+      <div class="form-grid" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr))">
+        <div class="check-row"><input type="checkbox" id="pt-at-asma" onchange="alergiaMudou()"><label for="pt-at-asma">Asma</label></div>
+        <div class="check-row"><input type="checkbox" id="pt-at-rinite" onchange="alergiaMudou()"><label for="pt-at-rinite">Rinite alérgica</label></div>
+        <div class="check-row"><input type="checkbox" id="pt-at-dermatite" onchange="alergiaMudou()"><label for="pt-at-dermatite">Dermatite atópica</label></div>
+        <div class="check-row"><input type="checkbox" id="pt-at-alimentar" onchange="alergiaMudou()"><label for="pt-at-alimentar">Alergia alimentar</label></div>
+      </div>
+      <div class="form-grid" style="margin-top:10px">
+        <div class="form-group fw"><label for="pt-reacao">Tipo de reação apresentada <span class="hint">(diferencia alergia verdadeira de intolerância — muda a conduta)</span></label><input id="pt-reacao" oninput="salvarFormulario()" placeholder="ex: urticária e broncoespasmo com diclofenaco; náusea isolada com codeína"></div>
+      </div>
+      <div class="alert alert-danger" id="alertaAnalgesia">Dipirona, AINE e paracetamol comprometidos — a analgesia multimodal padrão não é aplicável. Combine com a anestesia a estratégia regional (morfina neuroaxial e/ou bloqueio de parede) <b>antes</b> do procedimento.</div>
+      <div class="alert alert-warning" id="alertaLatex">Alergia a látex — sinalizar a sala como <b>latex-free</b>, usar luvas e materiais sem látex, e agendar preferencialmente como primeiro caso do dia.</div>
     </div>
   </div>
 
@@ -980,16 +1035,16 @@ input[type="checkbox"]{width:17px;height:17px;cursor:pointer;accent-color:var(--
       <div style="display:flex;gap:26px;flex-wrap:wrap;margin-top:12px">
         <div>
           <p style="font-weight:700;font-size:.85rem;margin-bottom:4px">Alergias</p>
-          <div class="check-row"><input type="checkbox" id="rx-al-dipirona" onchange="montarRxItens()"><label for="rx-al-dipirona">Dipirona</label></div>
-          <div class="check-row"><input type="checkbox" id="rx-al-aine" onchange="montarRxItens()"><label for="rx-al-aine">AINE</label></div>
-          <div class="check-row"><input type="checkbox" id="rx-al-opioide" onchange="montarRxItens()"><label for="rx-al-opioide">Opioide</label></div>
-          <div class="check-row"><input type="checkbox" id="rx-al-cefalo" onchange="montarRxItens()"><label for="rx-al-cefalo">Cefalosporina / penicilina</label></div>
+          <div class="check-row"><input type="checkbox" id="rx-al-dipirona" onchange="montarRxItens();atualizarBannerAlergias();atualizarCenarios()"><label for="rx-al-dipirona">Dipirona</label></div>
+          <div class="check-row"><input type="checkbox" id="rx-al-aine" onchange="montarRxItens();atualizarBannerAlergias();atualizarCenarios()"><label for="rx-al-aine">AINE</label></div>
+          <div class="check-row"><input type="checkbox" id="rx-al-opioide" onchange="montarRxItens();atualizarBannerAlergias();atualizarCenarios()"><label for="rx-al-opioide">Opioide</label></div>
+          <div class="check-row"><input type="checkbox" id="rx-al-cefalo" onchange="montarRxItens();atualizarBannerAlergias();atualizarCenarios()"><label for="rx-al-cefalo">Cefalosporina / penicilina</label></div>
         </div>
         <div>
           <p style="font-weight:700;font-size:.85rem;margin-bottom:4px">Condições associadas</p>
-          <div class="check-row"><input type="checkbox" id="rx-co-pe" onchange="montarRxItens()"><label for="rx-co-pe">Pré-eclâmpsia / HAS</label></div>
-          <div class="check-row"><input type="checkbox" id="rx-co-dm" onchange="montarRxItens()"><label for="rx-co-dm">Diabetes / DMG</label></div>
-          <div class="check-row"><input type="checkbox" id="rx-co-anemia" onchange="montarRxItens()"><label for="rx-co-anemia">Anemia</label></div>
+          <div class="check-row"><input type="checkbox" id="rx-co-pe" onchange="montarRxItens();atualizarBannerAlergias();atualizarCenarios()"><label for="rx-co-pe">Pré-eclâmpsia / HAS</label></div>
+          <div class="check-row"><input type="checkbox" id="rx-co-dm" onchange="montarRxItens();atualizarBannerAlergias();atualizarCenarios()"><label for="rx-co-dm">Diabetes / DMG</label></div>
+          <div class="check-row"><input type="checkbox" id="rx-co-anemia" onchange="montarRxItens();atualizarBannerAlergias();atualizarCenarios()"><label for="rx-co-anemia">Anemia</label></div>
         </div>
       </div>
     </div>
@@ -1385,6 +1440,8 @@ function limparAba(aba, silencioso){
     Object.keys(PT_MANUAIS).forEach(k => { delete PT_MANUAIS[k]; });
     setV('pt-imc', '');
     atualizarCenarios();
+    atualizarBannerAlergias();
+    atualizarAlertasAlergia();
     ULTIMO_PLANO = null;
   }
   if (aba === 'descricao') {
@@ -1677,7 +1734,9 @@ const PLANO_MOD = {
   anemia:        { problema:'Anemia materna pré-operatória — reserva fisiológica reduzida para a perda sanguínea', metas:['Manter hemoglobina ≥ 10 g/dL antes do procedimento eletivo e obter hemograma de controle no 1º dia pós-operatório, sem necessidade de transfusão'], condutas:['Investigar a etiologia com perfil de ferro; repor ferro por via oral ou endovenosa conforme gravidade e tempo disponível; definir reserva de hemocomponentes conforme o grau; manter reposição de ferro na alta com reavaliação ambulatorial'] },
   cardiopatia:   { problema:'Cardiopatia materna — risco de descompensação hemodinâmica periparto', metas:['Prevenir insuficiência cardíaca, arritmia e edema agudo de pulmão; manter balanço hídrico neutro e monitorização adequada ao risco'], condutas:['Ecocardiograma e parecer cardiológico prévios, com classificação de risco; definir monitorização conforme a classe de risco','Anestesia titulada em doses fracionadas, evitando queda súbita da resistência vascular; evitar sobrecarga volêmica','Administrar uterotônico em infusão lenta e diluída, evitando bolus rápido e metilergometrina; reservar leito de UTI materna'] },
   tevPrevio:     { problema:'História de tromboembolismo venoso ou trombofilia — alto risco de evento tromboembólico puerperal', metas:['Manter anticoagulação profilática ou terapêutica conforme indicação por pelo menos 6 semanas após o parto, sem evento tromboembólico e sem hematoma neuroaxial'], condutas:['Suspender heparina de baixo peso molecular respeitando a janela mínima antes do bloqueio e reintroduzir apenas após o intervalo seguro do pós-operatório','Considerar dose intermediária ou terapêutica com parecer hematológico nas trombofilias de alto risco; manter prescrição domiciliar e orientar sinais de alarme na alta'] },
-  alergia:       { problema:'Alergia medicamentosa documentada — restrição terapêutica para profilaxia e analgesia', metas:['Evitar reação alérgica e, ainda assim, manter analgesia eficaz (escala visual analógica ≤ 3 em repouso) e profilaxia antibiótica adequada'], condutas:['Registrar o fármaco e o tipo de reação, diferenciando alergia verdadeira de intolerância; selecionar esquema alternativo de antibiótico e de analgesia conforme a restrição','Quando o esquema multimodal padrão estiver comprometido, priorizar a analgesia regional (morfina neuroaxial e/ou bloqueio de parede abdominal) como base do plano, com adjuvantes poupadores de opioide e reavaliação da dor a cada 6 h'] },
+  alergia:       { problema:'Alergia medicamentosa ou atopia documentada — restrição terapêutica para profilaxia e analgesia', metas:['Evitar reação alérgica e, ainda assim, manter analgesia eficaz (escala visual analógica ≤ 3 em repouso) e profilaxia antibiótica adequada','Assegurar que toda a equipe (anestesia, enfermagem, farmácia e neonatologia) esteja ciente das alergias antes da indução, com registro em pulseira e conferência no time out'], condutas:['Registrar o fármaco e o tipo de reação, diferenciando alergia verdadeira de intolerância; selecionar esquema alternativo de antibiótico e de analgesia conforme a restrição','Quando o esquema multimodal padrão estiver comprometido, priorizar a analgesia regional (morfina neuroaxial e/ou bloqueio de parede abdominal) como base do plano, com adjuvantes poupadores de opioide e reavaliação da dor a cada 6 h','Manter medicações de anafilaxia imediatamente disponíveis em sala (adrenalina, corticoide e anti-histamínico)'] },
+  alergiaLatex:  { problema:'Alergia ao látex — risco de reação anafilática intraoperatória', metas:['Realizar o procedimento em ambiente livre de látex, sem reação de hipersensibilidade'], condutas:['Sinalizar a sala como latex-free e conferir luvas, sondas, drenos, garrotes, seringas e demais materiais isentos de látex','Agendar preferencialmente como primeiro caso do dia para reduzir a carga de aeroalérgeno na sala; comunicar previamente enfermagem, anestesia e neonatologia','Manter medicações de anafilaxia imediatamente disponíveis em sala'] },
+  alergiaAntis:  { problema:'Alergia a antisséptico — restrição para a antissepsia cirúrgica', metas:['Realizar a antissepsia com agente alternativo seguro, sem reação cutânea e sem aumento do risco infeccioso'], condutas:['Selecionar antisséptico alternativo ao agente implicado (clorexidina ou iodopovidona, conforme a alergia) e registrar a escolha; conferir também a composição do curativo e dos adesivos'] },
   placentaPrevia:{ problema:'Placenta prévia — risco de hemorragia anteparto e intraoperatória', metas:['Manter perda sanguínea controlada e estabilidade hemodinâmica, com hemocomponentes disponíveis em sala'], condutas:['Confirmar a topografia placentária por ultrassonografia; planejar a histerotomia evitando a placenta; reservar hemocomponentes; cirurgião experiente escalado'] },
   acretismo:     { problema:'Suspeita de espectro de acretismo placentário — risco de hemorragia maciça e de histerectomia periparto', metas:['Realizar o procedimento com equipe multidisciplinar e hemocomponentes disponíveis, preservando a vida materna, com decisão cirúrgica definida antecipadamente e sem lesão de trato urinário não reconhecida'], condutas:['Ultrassonografia com Doppler, complementada por ressonância quando necessário, para definir topografia e invasão; programar o nascimento em caráter eletivo com corticoterapia quando pré-termo','Acionar equipe multidisciplinar (obstetra experiente, anestesia, urologia, cirurgia, hemoterapia, UTI e neonatologia); protocolo de transfusão maciça acionável','Não tentar dequitação forçada em caso de acretismo confirmado, mantendo a placenta in situ com histerectomia planejada; consentimento explícito para histerectomia e hemotransfusão; reservar UTI materna'] },
   cesareaPrevia: { problema:'Cesariana anterior — risco de aderências, de lesão de órgãos adjacentes e de acretismo', metas:['Realizar o procedimento sem lesão vesical ou intestinal, com tempo cirúrgico controlado'], condutas:['Rastrear acretismo por imagem quando houver placenta anterior ou prévia associada; prever adesiólise e tempo cirúrgico maior; realizar descolamento e rechaço vesical com cautela'] },
@@ -1715,7 +1774,7 @@ const PT_CENARIOS = [
   { id:'saf', label:'Síndrome antifosfolípide / LES', grupo:'Condições maternas' },
   { id:'saudeMental', label:'Vulnerabilidade psicossocial / transtorno mental', grupo:'Condições maternas' },
   { id:'recusaTransf', label:'Recusa formal de hemotransfusão', grupo:'Condições maternas', auto:() => v('pt-hemo').indexOf('Recusa') === 0 },
-  { id:'alergia', label:'Alergia medicamentosa relevante', grupo:'Condições maternas', auto:() => chk('rx-al-dipirona') || chk('rx-al-aine') || chk('rx-al-opioide') || chk('rx-al-cefalo') },
+  { id:'alergia', label:'Alergia medicamentosa / atopia relevante', grupo:'Condições maternas', auto:() => temAlergia() || chk('rx-al-dipirona') || chk('rx-al-aine') || chk('rx-al-opioide') || chk('rx-al-cefalo') },
   { id:'placentaPrevia', label:'Placenta prévia', grupo:'Placentação e hemorragia' },
   { id:'acretismo', label:'Suspeita de acretismo (PAS)', grupo:'Placentação e hemorragia' },
   { id:'cesareaPrevia', label:'Cesárea prévia / iteratividade', grupo:'Placentação e hemorragia', auto:() => Number(v('pt-c')) >= 1 },
@@ -1750,6 +1809,96 @@ const PT_SOLICITACOES = [
   'Manter contato pele a pele, alojamento conjunto e apoio ao aleitamento em livre demanda; registrar dificuldades de pega.',
   'Curativo oclusivo por 24 a 48 h; após, manter a ferida limpa, seca e descoberta, comunicando sinais flogísticos, secreção ou deiscência.'
 ];
+
+/* ---- ALERGIAS E ATOPIAS (transversal a todas as abas) ---- */
+const AL_CHECKS = [
+  ['pt-al-latex','látex'], ['pt-al-antisseptico','antisséptico (clorexidina/iodo)'], ['pt-al-anestesico','anestésico local'],
+  ['pt-al-cefalo2','cefalosporina/penicilina'], ['pt-al-dipirona2','dipirona'], ['pt-al-aine2','AINE'],
+  ['pt-al-paracetamol','paracetamol'], ['pt-al-opioide2','opioide']
+];
+const AT_CHECKS = [['pt-at-asma','asma'], ['pt-at-rinite','rinite alérgica'], ['pt-at-dermatite','dermatite atópica'], ['pt-at-alimentar','alergia alimentar']];
+/* nomes comerciais e princípios ativos reconhecidos no campo livre → classe de risco */
+const AL_KEYWORDS = {
+  dipirona: ['dipirona','novalgina','metamizol','anador','magnopyrol'],
+  aine: ['aine','aines','diclofenaco','voltaren','cataflam','ibuprofeno','alivium','advil','cetoprofeno','profenid','nimesulida','naproxeno','piroxicam','tenoxicam','celecoxib','meloxicam','aspirina','acido acetilsalicilico','ácido acetilsalicílico','aas'],
+  paracetamol: ['paracetamol','acetaminofeno','tylenol'],
+  opioide: ['opioide','opiáceo','opiaceo','morfina','tramadol','codeina','codeína','fentanil','meperidina','petidina','oxicodona','tylex'],
+  cefalo: ['penicilina','cefalosporina','cefazolina','cefalexina','ceftriaxona','amoxicilina','ampicilina','betalactamico','betalactâmico','clavulanato'],
+  latex: ['latex','látex','borracha'],
+  antisseptico: ['clorexidina','iodo','iodopovidona','povidona','pvpi','povidine']
+};
+const AL_CHK_CLASSE = { dipirona:'pt-al-dipirona2', aine:'pt-al-aine2', paracetamol:'pt-al-paracetamol', opioide:'pt-al-opioide2', cefalo:'pt-al-cefalo2', latex:'pt-al-latex', antisseptico:'pt-al-antisseptico' };
+function classeAlergica(classe){
+  if (chk(AL_CHK_CLASSE[classe])) return true;
+  const txt = v('pt-alergias').toLowerCase();
+  if (!txt) return false;
+  const chaves = AL_KEYWORDS[classe] || [];
+  for (let i = 0; i < chaves.length; i++) { if (txt.indexOf(chaves[i]) >= 0) return true; }
+  return false;
+}
+function listaAlergias(){
+  const out = [], vistos = {};
+  const add = x => { const k = x.toLowerCase().trim(); if (k && !vistos[k]) { vistos[k] = true; out.push(x.trim()); } };
+  v('pt-alergias').split(/[,;]/).forEach(add);
+  AL_CHECKS.forEach(a => { if (chk(a[0])) add(a[1]); });
+  // marcações feitas direto na aba Prescrição — só entram se a classe ainda não foi
+  // declarada aqui (evita listar "AINE" ao lado do "diclofenaco" que o gerou)
+  [['rx-al-dipirona','dipirona','dipirona'], ['rx-al-aine','AINE','aine'], ['rx-al-opioide','opioide','opioide'], ['rx-al-cefalo','cefalosporina/penicilina','cefalo']]
+    .forEach(a => { if (chk(a[0]) && !classeAlergica(a[2])) add(a[1]); });
+  return out;
+}
+function listaAtopias(){
+  const out = [];
+  AT_CHECKS.forEach(a => { if (chk(a[0])) out.push(a[1]); });
+  return out;
+}
+function temAlergia(){ return listaAlergias().length > 0 || listaAtopias().length > 0; }
+/* Linha destacada usada em TODOS os documentos gerados */
+function blocoAlergias(){
+  const al = listaAlergias(), at = listaAtopias();
+  if (al.length || at.length) {
+    let s = '*** ALERGIAS: ' + al.map(x => x.toUpperCase()).join(', ') + ' ***';
+    if (!al.length) s = '*** ATOPIAS: ' + at.join(', ').toUpperCase() + ' ***';
+    else if (at.length) s += '\nAtopias: ' + at.join(', ') + '.';
+    if (v('pt-reacao')) s += '\nReação apresentada: ' + v('pt-reacao') + '.';
+    return s;
+  }
+  if (chk('pt-nega-alergia')) return 'Alergias e atopias: nega (negativa ativa registrada).';
+  return '[ALERGIAS NAO INFORMADAS]';
+}
+function alergiaMudou(){
+  // sincroniza ANTES de reavaliar, para que a negativa não seja bloqueada por uma marcação obsoleta
+  const pares = [['dipirona','rx-al-dipirona'], ['aine','rx-al-aine'], ['opioide','rx-al-opioide'], ['cefalo','rx-al-cefalo']];
+  pares.forEach(p => { if ($(p[1])) $(p[1]).checked = classeAlergica(p[0]); });
+  if (temAlergia() && $('pt-nega-alergia')) $('pt-nega-alergia').checked = false;
+  atualizarAlertasAlergia();
+  atualizarBannerAlergias();
+  atualizarCenarios();
+  if (typeof montarRxItens === 'function') montarRxItens();
+  salvarFormulario();
+}
+function atualizarAlertasAlergia(){
+  const semAnalgesia = (classeAlergica('dipirona') ? 1 : 0) + (classeAlergica('aine') ? 1 : 0) + (classeAlergica('paracetamol') ? 1 : 0);
+  if ($('alertaAnalgesia')) $('alertaAnalgesia').classList.toggle('show', semAnalgesia >= 2);
+  if ($('alertaLatex')) $('alertaLatex').classList.toggle('show', classeAlergica('latex'));
+}
+function atualizarBannerAlergias(){
+  const barra = $('ptAlergiasBar'), alvo = $('ptAlergiasTexto');
+  if (!barra || !alvo) return;
+  const al = listaAlergias(), at = listaAtopias();
+  if (al.length || at.length) {
+    const partes = [];
+    if (al.length) partes.push('ALERGIAS: ' + al.map(x => x.toUpperCase()).join(', '));
+    if (at.length) partes.push('Atopias: ' + at.join(', '));
+    alvo.textContent = partes.join('  |  ');
+    barra.classList.add('show'); barra.classList.remove('negado');
+  } else if (chk('pt-nega-alergia')) {
+    alvo.textContent = 'Nega alergias e atopias';
+    barra.classList.add('show'); barra.classList.add('negado');
+  } else {
+    barra.classList.remove('show'); barra.classList.remove('negado');
+  }
+}
 
 function imcPlano(){
   const peso = parseFloat(String(v('pt-peso')).replace(',','.'));
@@ -1803,6 +1952,9 @@ function cenariosAtivos(){
   PT_CENARIOS.forEach(c => { if (chk('ptc-' + c.id)) ativos.push(c.id); });
   // HELLP/eclâmpsia implica o manejo da pré-eclâmpsia (sulfato de magnésio e controle pressórico)
   if (ativos.indexOf('hellp') >= 0 && ativos.indexOf('preeclampsia') < 0) ativos.push('preeclampsia');
+  // alergias de impacto cirúrgico entram por si, independentemente do checkbox de cenário
+  if (classeAlergica('latex')) ativos.push('alergiaLatex');
+  if (classeAlergica('antisseptico')) ativos.push('alergiaAntis');
   return ativos;
 }
 function puxarDadosParaPlano(){
@@ -1871,6 +2023,7 @@ function gerarPlano(){
   if (CONFIG.hospital) s += CONFIG.hospital + '\n';
   s += SEP;
   s += 'Paciente: ' + nome + '  —  Registro/Atendimento: ' + reg + (v('pt-leito') ? '  —  Leito: ' + v('pt-leito') : '') + '\n';
+  s += blocoAlergias() + '\n';
   const dem = [];
   if (v('pt-idade')) dem.push(v('pt-idade') + ' anos');
   if (v('pt-g')) dem.push('G' + v('pt-g') + 'P' + (v('pt-p')||'0') + 'C' + (v('pt-c')||'0') + 'A' + (v('pt-a')||'0'));
@@ -2033,6 +2186,7 @@ function gerarDescricao(){
   s += 'IDENTIFICAÇÃO\n';
   s += 'Paciente: ' + (v('dc-nome') || '[NOME DA PACIENTE]') + '\n';
   s += 'Prontuário/Registro: ' + (v('dc-registro') || '[REGISTRO]') + '\n';
+  s += blocoAlergias() + '\n';
   if (v('dc-dn')) s += 'Data de nascimento: ' + dataBR(v('dc-dn')) + (v('dc-idade') ? ' (' + v('dc-idade') + ' anos)' : '') + '\n';
   else if (v('dc-idade')) s += 'Idade: ' + v('dc-idade') + ' anos\n';
   if (v('dc-g')) s += 'Paridade: G' + v('dc-g') + 'P' + (v('dc-p')||'0') + 'C' + (v('dc-c')||'0') + 'A' + (v('dc-a')||'0') + '\n';
@@ -2194,6 +2348,7 @@ function gerarEvolucao(){
   if (CONFIG.hospital) s += CONFIG.hospital + '\n';
   s += 'Data: ' + (v('ev-data-exame') ? dataBR(v('ev-data-exame')) : dataBR(hojeISO())) + '  Hora: ' + (v('ev-hora-exame') || agoraHora()) + '\n';
   s += 'Paciente: ' + (v('ev-nome') || '[NOME DA PACIENTE]') + '  —  Registro: ' + (v('ev-registro') || '[REGISTRO]') + (v('ev-leito') ? '  —  Leito: ' + v('ev-leito') : '') + '\n';
+  s += blocoAlergias() + '\n';
   if (v('ev-data-cirurgia')) s += 'Cesárea realizada em ' + dataBR(v('ev-data-cirurgia')) + '\n';
   s += SEP;
   s += 'S) ';
@@ -2456,9 +2611,8 @@ function gerarPrescricao(){
   const extras = [];
   if (v('rx-peso')) extras.push('Peso: ' + v('rx-peso') + ' kg');
   if ($('rx-imc').value) extras.push('IMC: ' + $('rx-imc').value);
-  const alergias = [['rx-al-dipirona','dipirona'],['rx-al-aine','AINE'],['rx-al-opioide','opioide'],['rx-al-cefalo','cefalosporina/penicilina']].filter(a => chk(a[0])).map(a => a[1]);
-  extras.push(alergias.length ? 'ALERGIAS: ' + alergias.join(', ').toUpperCase() : 'Alergias: nega');
-  s += extras.join('  —  ') + '\n';
+  if (extras.length) s += extras.join('  —  ') + '\n';
+  s += blocoAlergias() + '\n';
   s += SEP;
   let n = 1;
   const total = Number($('rxItens').dataset.total || 0);
@@ -2596,6 +2750,8 @@ function init(){
   calcularIMC();
   calcularIMCPlano();
   atualizarCenarios();
+  atualizarBannerAlergias();
+  atualizarAlertasAlergia();
   atualizarUtero();
   atualizarBanner();
   checarHPP(); checarPA();
