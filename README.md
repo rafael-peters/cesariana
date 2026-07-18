@@ -4,6 +4,7 @@
 
 Sistema completo em **um único arquivo HTML** (`index.html`) para gerar, copiar e colar no prontuário:
 
+0. **Plano Terapêutico** — documento exigido pelo prontuário eletrônico antes da descrição cirúrgica, no formato PROBLEMA/META. Gera o plano **médico** (complementar ao da enfermagem) com metas mensuráveis, adaptando-se a 32 cenários clínicos (pré-eclâmpsia, HELLP, diabetes, obesidade, acretismo, prematuridade, HIV, sífilis, óbito fetal, recusa de transfusão, alergias e outros), além de planejamento pré-operatório, solicitações à equipe e critérios de alta;
 1. **Descrição Cirúrgica** de cesariana — 7 presets de técnica (Tradicional, Misgav-Ladach, 3 Camadas, Intraparto, Emergência, Gemelar, Acretismo/PAS), bloco de manejo de HPP, equipe completa (CFM 1.638/2002), checklist OMS, classificação de Robson;
 2. **Evolução Pós-Operatória** (SOAP, 1º–3º DPO automático) — alinhada ao ERAS 2025, com escala de dor EVA visual, alertas automáticos de pré-eclâmpsia pós-parto e sepse puerperal;
 3. **Prescrição Padrão** (Dia 0 / 1º DPO / Alta) — analgesia multimodal em horário fixo, escore de risco TEV (RCOG 37a) com dose de enoxaparina ajustada por peso/IMC, presets para pré-eclâmpsia (MgSO4), alergias e alto risco de TEV.
