@@ -265,7 +265,11 @@ input[type="checkbox"]{width:17px;height:17px;cursor:pointer;accent-color:var(--
       <svg id="iconMoon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
     </button>
     <nav class="tabs">
-      <button class="tab-btn active" data-tab="descricao" onclick="showTab('descricao',this)">
+      <button class="tab-btn active" data-tab="plano" onclick="showTab('plano',this)">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1z"/><path d="M16 5h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/><path d="M8 12h3M8 16h3"/><path d="M14 12l1.5 1.5L18 11"/><path d="M14 16l1.5 1.5L18 15"/></svg>
+        <span class="tab-label">Plano Terapêutico</span>
+      </button>
+      <button class="tab-btn" data-tab="descricao" onclick="showTab('descricao',this)">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21L11 13"/><path d="M11 13l2.5-6.5L21 3l-3.5 7.5L11 13z"/></svg>
         <span class="tab-label">Descrição Cirúrgica</span>
       </button>
@@ -298,7 +302,145 @@ input[type="checkbox"]{width:17px;height:17px;cursor:pointer;accent-color:var(--
   </div>
 </div>
 <main>
-<section class="tab-content active" id="tab-descricao">
+<section class="tab-content active" id="tab-plano">
+  <div class="info-note"><b>Gere e lance este documento no prontuário ANTES da Descrição Cirúrgica.</b> O plano médico complementa o plano de cuidados da enfermagem — foca em diagnóstico, estratificação de risco, terapêutica, recursos e critérios de alta, com metas mensuráveis (parâmetro + valor-alvo + prazo).</div>
+
+  <div class="card" id="card-pt-id">
+    <button type="button" class="card-header" onclick="toggleCard(this)">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg>
+      Identificação e Indicação
+      <span class="resumo"></span><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="card-body">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+        <button class="btn btn-secondary" style="padding:6px 12px;font-size:.8rem" onclick="puxarDadosParaPlano()">↓ Puxar dados já preenchidos nas outras abas</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:span 2"><label for="pt-nome">Nome da paciente *</label><input id="pt-nome" oninput="syncPaciente('pt')"></div>
+        <div class="form-group"><label for="pt-registro">Prontuário / Atendimento *</label><input id="pt-registro" oninput="syncPaciente('pt')"></div>
+        <div class="form-group"><label for="pt-leito">Leito / setor</label><input id="pt-leito" oninput="syncPT('pt-leito')" placeholder="ex: SR CO 09"></div>
+        <div class="form-group"><label for="pt-idade">Idade</label><input id="pt-idade" type="number" oninput="syncPT('pt-idade')" placeholder="anos"></div>
+        <div class="form-group"><label>Paridade (G / P / C / A)</label>
+          <div style="display:flex;gap:5px">
+            <input id="pt-g" type="number" min="0" placeholder="G" oninput="syncPT('pt-g')"><input id="pt-p" type="number" min="0" placeholder="P" oninput="syncPT('pt-p')"><input id="pt-c" type="number" min="0" placeholder="C" oninput="syncPT('pt-c')" title="Cesáreas prévias"><input id="pt-a" type="number" min="0" placeholder="A" oninput="syncPT('pt-a')">
+          </div>
+        </div>
+        <div class="form-group"><label for="pt-ig">Idade gestacional</label><input id="pt-ig" placeholder="ex: 39s2d" oninput="syncPT('pt-ig')"></div>
+        <div class="form-group"><label for="pt-data">Data prevista do procedimento *</label><input id="pt-data" type="date" oninput="syncPT('pt-data')"></div>
+        <div class="form-group"><label for="pt-carater">Caráter</label>
+          <select id="pt-carater" onchange="syncPT('pt-carater');atualizarCenarios()">
+            <option>Eletiva</option><option>Urgência</option><option>Emergência (categoria 1)</option>
+          </select>
+        </div>
+        <div class="form-group"><label for="pt-peso">Peso (kg)</label><input id="pt-peso" type="number" step="0.1" oninput="syncPT('pt-peso');calcularIMCPlano()"></div>
+        <div class="form-group"><label for="pt-altura">Altura (cm)</label><input id="pt-altura" type="number" oninput="syncPT('pt-altura');calcularIMCPlano()"></div>
+        <div class="form-group"><label>IMC</label><input id="pt-imc" readonly placeholder="—" style="background:var(--c-surface-alt)"></div>
+        <div class="form-group fw"><label for="pt-indicacao">Indicação da cesárea *</label>
+          <div class="ec" data-cfg="indicacoes"><input id="pt-indicacao" oninput="syncPT('pt-indicacao')" onchange="syncPT('pt-indicacao')"><button type="button" class="ec-btn">&#9662;</button><div class="ec-list"></div></div>
+        </div>
+        <div class="form-group fw"><label for="pt-fundamentacao">Fundamentação clínica da indicação * <span class="hint">(exigida em auditoria — 1 a 2 frases)</span></label><textarea id="pt-fundamentacao" placeholder="ex: Gestante com duas cesáreas prévias, colo desfavorável e recusa formal a prova de trabalho de parto, com risco de rotura uterina superior ao benefício da via vaginal."></textarea></div>
+        <div class="form-group"><label for="pt-cid">CID-10 principal</label>
+          <div class="ec" data-cfg="ptCid"><input id="pt-cid" placeholder="ex: O82.0"><button type="button" class="ec-btn">&#9662;</button><div class="ec-list"></div></div>
+        </div>
+        <div class="form-group"><label for="pt-convenio">Convênio / autorização</label><input id="pt-convenio" placeholder="ex: Unimed — guia 123456"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="card-pt-cenarios">
+    <button type="button" class="card-header" onclick="toggleCard(this)">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 9v5"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>
+      Comorbidades e Cenários Clínicos <span class="hint">(cada item ativa problemas, metas e condutas próprios)</span>
+      <span class="resumo"></span><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="card-body">
+      <div class="info-note" id="ptAutoNote">Itens marcados automaticamente a partir das outras abas aparecem com <b>(auto)</b> — você pode desmarcar.</div>
+      <div id="ptCenarios"></div>
+      <div class="form-grid" style="margin-top:12px">
+        <div class="form-group fw"><label for="pt-outras-comorb">Outras comorbidades / observações clínicas</label><textarea id="pt-outras-comorb" placeholder="ex: hipotireoidismo em uso de levotiroxina; epilepsia controlada..."></textarea></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="card-pt-preop">
+    <button type="button" class="card-header" onclick="toggleCard(this)">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M8.5 11l1.5 1.5L12.5 9"/><path d="M8.5 16h8"/></svg>
+      Planejamento Pré-Operatório e Recursos
+      <span class="resumo"></span><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="form-group"><label for="pt-jejum">Jejum</label>
+          <div class="ec" data-cfg="ptJejum"><input id="pt-jejum"><button type="button" class="ec-btn">&#9662;</button><div class="ec-list"></div></div>
+        </div>
+        <div class="form-group"><label for="pt-jejum-hora">Horário do último alimento</label><input id="pt-jejum-hora" type="time"></div>
+        <div class="form-group fw"><label for="pt-exames">Exames pré-operatórios</label>
+          <div class="ec" data-cfg="ptExames"><input id="pt-exames"><button type="button" class="ec-btn">&#9662;</button><div class="ec-list"></div></div>
+        </div>
+        <div class="form-group fw"><label for="pt-hemo">Hemocomponentes</label>
+          <div class="ec" data-cfg="ptHemo"><input id="pt-hemo"><button type="button" class="ec-btn">&#9662;</button><div class="ec-list"></div></div>
+        </div>
+        <div class="form-group"><label for="pt-acesso">Acesso venoso</label>
+          <div class="ec" data-cfg="ptAcesso"><input id="pt-acesso"><button type="button" class="ec-btn">&#9662;</button><div class="ec-list"></div></div>
+        </div>
+        <div class="form-group"><label for="pt-anestesia-prog">Anestesia programada</label>
+          <div class="ec" data-cfg="anestesias"><input id="pt-anestesia-prog"><button type="button" class="ec-btn">&#9662;</button><div class="ec-list"></div></div>
+        </div>
+        <div class="form-group"><label for="pt-uti-materna">UTI materna</label>
+          <select id="pt-uti-materna"><option>Não prevista</option><option>Vaga reservada e confirmada</option><option>Solicitada — aguardando confirmação</option></select>
+        </div>
+        <div class="form-group"><label for="pt-uti-neo">Unidade / UTI neonatal</label>
+          <select id="pt-uti-neo"><option>Não prevista</option><option>Vaga confirmada antes da incisão</option><option>Solicitada — aguardando confirmação</option></select>
+        </div>
+        <div class="form-group"><label for="pt-neo-equipes">Equipes de neonatologia em sala</label>
+          <select id="pt-neo-equipes"><option>1 (uma equipe)</option><option>2 (gemelar)</option><option>3 ou mais (múltipla)</option></select>
+        </div>
+        <div class="form-group fw"><label for="pt-materiais">Materiais e recursos especiais</label>
+          <div class="ec" data-cfg="ptMateriais"><input id="pt-materiais"><button type="button" class="ec-btn">&#9662;</button><div class="ec-list"></div></div>
+        </div>
+      </div>
+      <p style="font-weight:700;font-size:.85rem;margin:14px 0 6px">Consentimentos e verificações</p>
+      <div class="check-row"><input type="checkbox" id="pt-cons-cesarea" checked><label for="pt-cons-cesarea">Consentimento informado da cesariana</label></div>
+      <div class="check-row"><input type="checkbox" id="pt-cons-anestesia" checked><label for="pt-cons-anestesia">Consentimento anestésico / avaliação pré-anestésica registrada</label></div>
+      <div class="check-row"><input type="checkbox" id="pt-cons-laqueadura" onchange="atualizarCenarios()"><label for="pt-cons-laqueadura">Termo específico de laqueadura (Lei 9.263/96) — requisitos legais conferidos</label></div>
+      <div class="check-row"><input type="checkbox" id="pt-cons-histerectomia"><label for="pt-cons-histerectomia">Consentimento explícito para histerectomia e hemotransfusão</label></div>
+      <div class="check-row"><input type="checkbox" id="pt-checklist-oms" checked><label for="pt-checklist-oms">Checklist de Cirurgia Segura da OMS previsto (sign in / time out / sign out)</label></div>
+      <div class="check-row"><input type="checkbox" id="pt-neo-comunicada" checked><label for="pt-neo-comunicada">Neonatologia comunicada previamente</label></div>
+    </div>
+  </div>
+
+  <div class="card" id="card-pt-alta">
+    <button type="button" class="card-header" onclick="toggleCard(this)">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10l8-6 8 6v10a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z"/></svg>
+      Metas de Alta, Reavaliação e Seguimento
+      <span class="resumo"></span><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="form-group"><label for="pt-internacao">Previsão de internação</label>
+          <div class="ec" data-cfg="ptInternacao"><input id="pt-internacao"><button type="button" class="ec-btn">&#9662;</button><div class="ec-list"></div></div>
+        </div>
+        <div class="form-group"><label for="pt-reavaliacao">Reavaliação do plano</label>
+          <div class="ec" data-cfg="ptReavaliacao"><input id="pt-reavaliacao"><button type="button" class="ec-btn">&#9662;</button><div class="ec-list"></div></div>
+        </div>
+        <div class="form-group fw"><label for="pt-criterios-alta">Critérios objetivos de alta</label>
+          <div class="ec" data-cfg="ptCriteriosAlta"><input id="pt-criterios-alta"><button type="button" class="ec-btn">&#9662;</button><div class="ec-list"></div></div>
+        </div>
+        <div class="form-group fw"><label for="pt-seguimento">Seguimento pós-alta</label>
+          <div class="ec" data-cfg="ptSeguimento"><input id="pt-seguimento"><button type="button" class="ec-btn">&#9662;</button><div class="ec-list"></div></div>
+        </div>
+      </div>
+      <div class="check-row" style="margin-top:8px"><input type="checkbox" id="pt-ref-enfermagem" checked><label for="pt-ref-enfermagem">Incluir frase de integração com o plano de cuidados da enfermagem <span class="hint">(recomendado — acreditação)</span></label></div>
+      <div class="check-row"><input type="checkbox" id="pt-solicitacoes" checked><label for="pt-solicitacoes">Incluir bloco "Solicitações à equipe assistencial" (rotinas de enfermagem a executar)</label></div>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-secondary" onclick="limparAba('plano')">Limpar aba</button>
+  </div>
+</section>
+
+<section class="tab-content" id="tab-descricao">
   <div class="chips">
     <span class="chips-label">Presets:</span>
     <button class="chip active" data-preset="tradicional" onclick="aplicarTecnica('tradicional',this)">Tradicional</button>
@@ -963,6 +1105,8 @@ input[type="checkbox"]{width:17px;height:17px;cursor:pointer;accent-color:var(--
     </div>
     <div class="modal-footer">
       <span class="char-count" id="charCount"></span>
+      <button class="btn btn-secondary hidden" id="btnCopiaProblemas" onclick="copiarParte('problemas')">Copiar coluna PROBLEMA</button>
+      <button class="btn btn-secondary hidden" id="btnCopiaMetas" onclick="copiarParte('metas')">Copiar coluna META</button>
       <button class="btn btn-secondary" onclick="window.print()">Imprimir</button>
       <button class="btn btn-secondary" onclick="baixarTxt()">Baixar .txt</button>
       <button class="btn btn-secondary" onclick="copiarTexto(false)">Copiar</button>
@@ -1052,7 +1196,17 @@ const CONFIG_PADRAO = {
     evPlanoResgate: { rotulo: 'PO Plano — Resgate', opcoes: ['Tramadol 100 mg IV/VO até 8/8h se EVA > 6 (curto período — vigiar sonolência/sucção do RN em lactação)','Morfina 3–5 mg SC se EVA > 7 (vigiar sedação materna e do RN)','Reforçar dipirona/paracetamol e reavaliação médica se EVA > 6 (sem opioide)'], padrao: 'Tramadol 100 mg IV/VO até 8/8h se EVA > 6 (curto período — vigiar sonolência/sucção do RN em lactação)' },
     evPlanoTEV: { rotulo: 'PO Plano — Tromboprofilaxia', opcoes: ['Deambulação precoce + compressão mecânica até deambular plenamente','Deambulação precoce + Enoxaparina 40 mg SC 1x/dia (iniciada 6–12h pós-op)','Enoxaparina em dose ajustada por peso — ver escore TEV na aba Prescrição'], padrao: 'Deambulação precoce + compressão mecânica até deambular plenamente' },
     evPlanoCurativo: { rotulo: 'PO Plano — Curativo', opcoes: ['Retirar curativo oclusivo após 24–48h; manter FO limpa e seca, descoberta','Manter curativo oclusivo — trocar se saturado','Curativo diário com avaliação da FO'], padrao: 'Retirar curativo oclusivo após 24–48h; manter FO limpa e seca, descoberta' },
-    evPlanoFerro: { rotulo: 'PO Plano — Ferro', opcoes: ['Sulfato ferroso 40 mg de ferro elementar VO 1x/dia (profilaxia)','Sulfato ferroso 100–200 mg de ferro elementar/dia (tratamento de anemia)','Não prescrever ferro'], padrao: 'Sulfato ferroso 40 mg de ferro elementar VO 1x/dia (profilaxia)' }
+    evPlanoFerro: { rotulo: 'PO Plano — Ferro', opcoes: ['Sulfato ferroso 40 mg de ferro elementar VO 1x/dia (profilaxia)','Sulfato ferroso 100–200 mg de ferro elementar/dia (tratamento de anemia)','Não prescrever ferro'], padrao: 'Sulfato ferroso 40 mg de ferro elementar VO 1x/dia (profilaxia)' },
+    ptCid: { rotulo: 'Plano — CID-10', opcoes: ['O82.0 — Parto por cesariana eletiva','O82.1 — Parto por cesariana de emergência','O82.9 — Parto por cesariana não especificada','O34.2 — Assistência materna por cicatriz uterina de cirurgia prévia','O14.9 — Pré-eclâmpsia não especificada','O14.1 — Pré-eclâmpsia grave','O24.4 — Diabetes mellitus que surge durante a gravidez','O36.5 — Assistência materna por crescimento fetal insuficiente','O44.1 — Placenta prévia com hemorragia','O30.0 — Gestação dupla','O68 — Trabalho de parto complicado por estresse fetal','O99.0 — Anemia complicando a gravidez'], padrao: 'O82.0 — Parto por cesariana eletiva' },
+    ptJejum: { rotulo: 'Plano — Jejum', opcoes: ['8 h para sólidos, 6 h para refeição leve e 2 h para líquidos claros; bebida com carboidrato até 2 h antes (ERAS)','8 h para sólidos e 2 h para líquidos claros (sem carboidrato — diabetes)','Jejum não assegurado (caráter de urgência) — profilaxia farmacológica de aspiração e indução em sequência rápida'], padrao: '8 h para sólidos, 6 h para refeição leve e 2 h para líquidos claros; bebida com carboidrato até 2 h antes (ERAS)' },
+    ptExames: { rotulo: 'Plano — Exames pré-op', opcoes: ['Tipagem ABO/RhD, Coombs indireto e hemograma revisados; sorologias do pré-natal conferidas','Tipagem ABO/RhD, Coombs indireto, hemograma e coagulograma (plaquetas, TGO/TGP, creatinina, LDH)','Tipagem ABO/RhD, hemograma, glicemia capilar e função renal'], padrao: 'Tipagem ABO/RhD, Coombs indireto e hemograma revisados; sorologias do pré-natal conferidas' },
+    ptHemo: { rotulo: 'Plano — Hemocomponentes', opcoes: ['Tipagem e prova cruzada (type and screen), sem reserva efetiva','Reserva de 2 unidades de concentrado de hemácias','Reserva de 4 ou mais CH + plasma + plaquetas, com protocolo de transfusão maciça acionável','Recusa formal de hemotransfusão registrada — plano alternativo definido'], padrao: 'Tipagem e prova cruzada (type and screen), sem reserva efetiva' },
+    ptAcesso: { rotulo: 'Plano — Acesso venoso', opcoes: ['Um acesso venoso periférico calibroso (≥ 18G)','Dois acessos venosos periféricos calibrosos','Dois acessos calibrosos + considerar acesso central e linha arterial'], padrao: 'Um acesso venoso periférico calibroso (≥ 18G)' },
+    ptMateriais: { rotulo: 'Plano — Materiais especiais', opcoes: ['Rotina do centro obstétrico; ácido tranexâmico disponível','Ácido tranexâmico e balão de tamponamento intrauterino (Bakri) disponíveis em sala','Balão de Bakri, kit de suturas compressivas, instrumental de histerectomia e recuperador de sangue disponíveis','Material para bloqueio de parede abdominal (TAP/quadrado lombar) disponível'], padrao: 'Rotina do centro obstétrico; ácido tranexâmico disponível' },
+    ptInternacao: { rotulo: 'Plano — Previsão de internação', opcoes: ['48 a 72 horas','72 a 96 horas (comorbidade em acompanhamento)','A definir conforme evolução clínica'], padrao: '48 a 72 horas' },
+    ptReavaliacao: { rotulo: 'Plano — Reavaliação', opcoes: ['Reavaliação médica diária, com revisão multiprofissional do plano a cada 24 h','Reavaliação a cada 12 h nas primeiras 48 h','Reavaliação a cada 6 h enquanto em monitorização intensiva'], padrao: 'Reavaliação médica diária, com revisão multiprofissional do plano a cada 24 h' },
+    ptCriteriosAlta: { rotulo: 'Plano — Critérios de alta', opcoes: ['Afebril, hemodinamicamente estável, deambulando sem auxílio, aceitando dieta, diurese espontânea, dor controlada por via oral (EVA ≤ 3), útero contraído, lóquios fisiológicos, ferida sem sinais flogísticos, aleitamento estabelecido e recém-nascido em condições de alta','Critérios acima e, adicionalmente, níveis pressóricos controlados em 24 h sem medicação endovenosa','Critérios acima e, adicionalmente, hemoglobina de controle estável sem indicação transfusional'], padrao: 'Afebril, hemodinamicamente estável, deambulando sem auxílio, aceitando dieta, diurese espontânea, dor controlada por via oral (EVA ≤ 3), útero contraído, lóquios fisiológicos, ferida sem sinais flogísticos, aleitamento estabelecido e recém-nascido em condições de alta' },
+    ptSeguimento: { rotulo: 'Plano — Seguimento', opcoes: ['Retorno em 7 a 10 dias para avaliação da ferida operatória e revisão puerperal em 30 a 42 dias; método contraceptivo definido antes da alta','Retorno em 3 a 5 dias para controle pressórico, revisão puerperal em 30 a 42 dias e contracepção definida','Retorno em 7 dias com hemograma de controle e revisão puerperal em 30 a 42 dias'], padrao: 'Retorno em 7 a 10 dias para avaliação da ferida operatória e revisão puerperal em 30 a 42 dias; método contraceptivo definido antes da alta' }
   }
 };
 
@@ -1175,11 +1329,11 @@ let sincronizando = false;
 function syncPaciente(origem){
   if (sincronizando) return;
   sincronizando = true;
-  const grupos = { nome: ['dc-nome','ev-nome','rx-nome'], registro: ['dc-registro','ev-registro','rx-registro'] };
+  const grupos = { nome: ['dc-nome','ev-nome','rx-nome','pt-nome'], registro: ['dc-registro','ev-registro','rx-registro','pt-registro'] };
+  const idx = { ev: 1, rx: 2, pt: 3 };
   Object.keys(grupos).forEach(campo => {
     const ids = grupos[campo];
-    let fonte = null;
-    if (origem === 'ev') fonte = ids[1]; else if (origem === 'rx') fonte = ids[2]; else fonte = ids[0];
+    const fonte = ids[idx[origem] !== undefined ? idx[origem] : 0];
     const val = v(fonte);
     ids.forEach(id => { if (id !== fonte) setV(id, val); });
   });
@@ -1211,7 +1365,7 @@ function confirmarNovaPaciente(){
 }
 function novaPaciente(){
   $('modalConfirm').classList.remove('show');
-  limparAba('descricao', true); limparAba('evolucao', true); limparAba('prescricao', true);
+  limparAba('plano', true); limparAba('descricao', true); limparAba('evolucao', true); limparAba('prescricao', true);
   try { sessionStorage.removeItem('cesariana_v3_form'); } catch(e) {}
   atualizarBanner();
   toast('Dados da paciente apagados nas três abas');
@@ -1224,6 +1378,15 @@ function limparAba(aba, silencioso){
     else if (el.tagName === 'SELECT') el.selectedIndex = 0;
     else el.value = '';
   });
+  if (aba === 'plano') {
+    aplicarPadroesCombosEm('tab-plano');
+    setV('pt-data', hojeISO());
+    ['pt-cons-cesarea','pt-cons-anestesia','pt-checklist-oms','pt-neo-comunicada','pt-ref-enfermagem','pt-solicitacoes'].forEach(id => { if ($(id)) $(id).checked = true; });
+    Object.keys(PT_MANUAIS).forEach(k => { delete PT_MANUAIS[k]; });
+    setV('pt-imc', '');
+    atualizarCenarios();
+    ULTIMO_PLANO = null;
+  }
   if (aba === 'descricao') {
     aplicarPadroesCombosEm('tab-descricao');
     setV('dc-eq-cirurgiao', (CONFIG.medico || '') + (CONFIG.crm ? ' — ' + CONFIG.crm : ''));
@@ -1383,7 +1546,9 @@ function fallbackCopiar(t){
     return ok;
   } catch(e) { return false; }
 }
-function abrirModal(titulo, texto){
+function abrirModal(titulo, texto, ehPlano){
+  $('btnCopiaProblemas').classList.toggle('hidden', !ehPlano);
+  $('btnCopiaMetas').classList.toggle('hidden', !ehPlano);
   $('modalTitulo').textContent = titulo;
   $('modalTexto').value = texto;
   $('charCount').textContent = texto.length + ' caracteres';
@@ -1424,7 +1589,8 @@ function baixarTxt(){
 }
 function gerarAtual(){
   const ativa = document.querySelector('.tab-content.active').id;
-  if (ativa === 'tab-descricao') gerarDescricao();
+  if (ativa === 'tab-plano') gerarPlano();
+  else if (ativa === 'tab-descricao') gerarDescricao();
   else if (ativa === 'tab-evolucao') gerarEvolucao();
   else if (ativa === 'tab-prescricao') gerarPrescricao();
 }
@@ -1433,7 +1599,7 @@ function gerarAtual(){
 const FORM_KEY = 'cesariana_v3_form';
 function salvarFormulario(){
   try {
-    const dados = { evaValor: evaValor, extras: RX_EXTRAS.slice(), meta: { tec: tecnicaAtual, mom: MOMENTO, dpo: DPO, rxp: RX_PRESET } };
+    const dados = { evaValor: evaValor, extras: RX_EXTRAS.slice(), meta: { tec: tecnicaAtual, mom: MOMENTO, dpo: DPO, rxp: RX_PRESET, ptm: Object.keys(PT_MANUAIS) } };
     document.querySelectorAll('main input[id], main select[id], main textarea[id]').forEach(el => {
       if (el.type === 'file') return;
       dados[el.id] = (el.type === 'checkbox') ? { c: el.checked } : { v: el.value };
@@ -1460,6 +1626,7 @@ function restaurarFormulario(){
       MOMENTO = dados.meta.mom || 'dpo1';
       DPO = dados.meta.dpo !== undefined ? dados.meta.dpo : 1;
       RX_PRESET = dados.meta.rxp || 'padrao';
+      if (Array.isArray(dados.meta.ptm)) dados.meta.ptm.forEach(k => { PT_MANUAIS[k] = true; });
       document.querySelectorAll('[data-preset]').forEach(c => c.classList.toggle('active', c.dataset.preset === tecnicaAtual));
       document.querySelectorAll('[data-rxpreset]').forEach(c => c.classList.toggle('active', c.dataset.rxpreset === RX_PRESET));
       document.querySelectorAll('#segRx button').forEach(b => b.classList.toggle('active', b.dataset.mom === MOMENTO));
@@ -1485,6 +1652,291 @@ function restaurarFormulario(){
 }
 document.addEventListener('input', e => { if (e.target.closest('main')) salvarFormulario(); });
 document.addEventListener('change', e => { if (e.target.closest('main')) { salvarFormulario(); atualizarBanner(); } });
+/* ================= PLANO TERAPÊUTICO ================= */
+/* Problemas-base: entram sempre. Metas em formato mensurável (parâmetro + alvo + prazo). */
+const PLANO_BASE = [
+  { id:'resolucao', problema:'Gestação com indicação de resolução por via alta', metas:['Realizar a cesariana na data programada, com nascimento de recém-nascido vivo, Apgar de 5º minuto ≥ 7 e sem intercorrências maternas'], condutas:['Confirmar idade gestacional, indicação e classificação de Robson; consentimento informado assinado; checklist de Cirurgia Segura da OMS aplicado em três etapas'] },
+  { id:'anestesico', problema:'Risco anestésico relacionado ao bloqueio neuroaxial', metas:['Manter estabilidade hemodinâmica durante o bloqueio (pressão sistólica ≥ 90% do basal), sem broncoaspiração e sem conversão não planejada para anestesia geral'], condutas:['Avaliação pré-anestésica documentada (ASA, via aérea, jejum); prevenção da hipotensão pós-raqui baseada em vasopressor, com reposição volêmica ajustada à condição materna; prevenção ativa de hipotermia com meta de temperatura central ≥ 36 °C; profilaxia de náusea e vômito'] },
+  { id:'hpp', problema:'Risco de hemorragia pós-parto', metas:['Manter perda sanguínea estimada < 1000 mL, útero contraído ao término do procedimento e ausência de necessidade de hemotransfusão','Manter pressão sistólica > 90 mmHg e frequência cardíaca < 110 bpm nas primeiras 24 h; hemoglobina de controle em 24 h sem queda superior a 3 g/dL e sem indicação transfusional'], condutas:['Uterotônico profilático imediatamente após o clampeamento do cordão; ácido tranexâmico 1 g IV disponível em sala; quantificação da perda sanguínea; escalonamento de manejo definido (segunda linha medicamentosa, balão de tamponamento, suturas compressivas, ligaduras) com material conferido antes da incisão','Definir a segunda linha uterotônica conforme as comorbidades: metilergometrina contraindicada em hipertensão, pré-eclâmpsia e cardiopatia, situações em que o misoprostol é a alternativa'] },
+  { id:'isc', problema:'Risco de infecção de sítio cirúrgico e de endometrite', metas:['Manter-se afebril (temperatura < 38 °C) e com ferida operatória limpa e seca até a alta; ausência de infecção de sítio cirúrgico em 30 dias'], condutas:['Antibioticoprofilaxia em dose única 30 a 60 minutos antes da incisão, com dose ajustada ao peso (cefazolina 2 g; 3 g se peso > 120 kg); antissepsia da pele com clorexidina alcoólica; normotermia e normoglicemia perioperatórias; curativo oclusivo por 24 a 48 h'] },
+  { id:'tev', problema:'Risco de tromboembolismo venoso puerperal', metas:['Prevenir evento tromboembólico até a alta e nas 6 semanas seguintes; iniciar deambulação em até 12 a 24 h do pós-operatório'], condutas:['Estratificar o risco pelo escore RCOG Green-top 37a e instituir a profilaxia correspondente; compressão mecânica instalada antes da indução e mantida até a deambulação plena','Respeitar a janela de segurança do bloqueio neuroaxial: intervalo mínimo de 12 h após dose profilática e de 24 h após dose terapêutica de heparina de baixo peso molecular, com reintrodução não antes de 4 h da retirada do cateter e de 6 a 12 h da punção'] },
+  { id:'fetal', problema:'Vitalidade fetal e transição neonatal', metas:['Garantir assistência neonatal qualificada em sala, com Apgar de 5º minuto ≥ 7, clampeamento oportuno do cordão (≥ 60 s) e contato pele a pele na primeira hora quando o binômio estiver estável'], condutas:['Confirmar vitalidade fetal imediatamente antes do bloqueio; comunicar previamente a neonatologia; conferir berço aquecido e material de reanimação neonatal'] },
+  { id:'dor', problema:'Dor pós-operatória (incisional e por contração uterina)', metas:['Manter escala visual analógica ≤ 3 em repouso e ≤ 4 à movimentação nas primeiras 48 h, com necessidade decrescente de resgate opioide e transição para analgesia exclusivamente oral até a alta; reavaliar a dor a cada 6 h e 30 minutos após cada resgate'], condutas:['Analgesia multimodal em horário fixo conforme protocolo ERAS, com opioide reservado ao resgate; considerar morfina neuroaxial no bloqueio e bloqueio de parede abdominal quando indicado'] },
+  { id:'aleitamento', problema:'Aleitamento materno e vínculo mãe-bebê', metas:['Iniciar a amamentação na primeira hora de vida quando as condições permitirem e manter aleitamento exclusivo na alta, salvo contraindicação registrada'], condutas:['Alojamento conjunto e livre demanda; prescrever apenas fármacos compatíveis com a lactação, evitando codeína e usando tramadol com cautela e por curto período'] }
+];
+
+/* Modificadores: acrescentam problema/metas/condutas conforme o cenário ativo. */
+const PLANO_MOD = {
+  urgencia:      { problema:'Indicação de resolução em caráter de urgência — risco materno ou fetal com necessidade de antecipação', metas:['Manter intervalo entre a decisão e a incisão ≤ 75 minutos'], condutas:['Reavaliar jejum e risco de broncoaspiração, com profilaxia farmacológica quando indicada; manter vigilância fetal até o bloqueio; comunicar banco de sangue e neonatologia'] },
+  emergencia:    { problema:'Indicação de resolução em caráter de emergência (categoria 1) com estômago potencialmente cheio', metas:['Manter intervalo entre a decisão e a incisão ≤ 30 minutos, sem broncoaspiração'], condutas:['Acionamento imediato de sala, anestesiologia e neonatologia; considerar anestesia geral com indução em sequência rápida se o bloqueio for inviável no tempo; antibiótico na indução sem retardar a incisão; acionar reserva de hemocomponentes'] },
+  preeclampsia:  { problema:'Síndrome hipertensiva gestacional — pré-eclâmpsia', metas:['Manter pressão arterial entre 130–150 x 80–100 mmHg, evitando queda abrupta','Prevenir eclâmpsia e edema agudo de pulmão; manter diurese ≥ 0,5 mL/kg/h e controle laboratorial seriado'], condutas:['Anti-hipertensivo de crise se pressão sistólica ≥ 160 mmHg OU diastólica ≥ 110 mmHg, com redução gradual e reavaliação a cada 15 a 20 minutos','Sulfato de magnésio em esquema de ataque e manutenção, mantido por 24 h após o parto, com vigilância de reflexos, frequência respiratória e diurese, e gluconato de cálcio disponível à beira do leito','Hemograma com plaquetas, transaminases, creatinina, LDH e bilirrubinas; confirmar contagem plaquetária segura antes do bloqueio neuroaxial (habitualmente ≥ 70.000–80.000/mm³, estável e sem coagulopatia)','Prevenção da hipotensão pós-raqui baseada em vasopressor, com restrição do volume de cristaloide — a co-carga liberal é contraindicada pelo risco de edema agudo de pulmão','Balanço hídrico rigoroso; evitar metilergometrina em caso de hemorragia, preferindo misoprostol como segunda linha; manter anti-hipertensivo e reavaliação pressórica precoce após a alta'] },
+  hellp:         { problema:'Síndrome HELLP / eclâmpsia — risco de coagulopatia, de disfunção orgânica e de recorrência convulsiva', metas:['Prevenir eclâmpsia e recorrência convulsiva com sulfato de magnésio mantido por 24 h após o parto ou após a última convulsão, o que ocorrer por último','Manter plaquetas e função hepática e renal monitorizadas, sem sangramento ativo'], condutas:['Reservar hemocomponentes incluindo plaquetas; transfundir plaquetas conforme critério clínico e contagem; reservar leito de UTI materna','Reavaliar a via anestésica em caso de plaquetopenia: contagem inferior a 70.000/mm³, em queda rápida ou com coagulopatia contraindica o bloqueio neuroaxial'] },
+  diabetes:      { problema:'Diabetes mellitus (gestacional ou prévio) — risco de descompensação perioperatória e de hipoglicemia neonatal', metas:['Manter glicemia capilar entre 70 e 180 mg/dL no perioperatório, sem hipoglicemia materna e sem cetose','Garantir rastreamento de hipoglicemia no recém-nascido'], condutas:['Programar o procedimento como primeiro caso do dia para reduzir o tempo de jejum; suspender hipoglicemiante oral e insulina prandial no dia, reduzindo a insulina basal conforme protocolo','Glicemia capilar na admissão e a cada 1 a 2 horas; solução glicosada e insulina regular disponíveis conforme necessidade','Reintroduzir dieta precocemente e reajustar insulina no puerpério; comunicar a neonatologia; programar reclassificação com teste de tolerância à glicose em 4 a 12 semanas'] },
+  obesidade:     { problema:'Obesidade materna — risco aumentado de infecção de sítio cirúrgico, tromboembolismo e falha de bloqueio', metas:['Garantir profilaxia antibiótica e antitrombótica em dose ajustada ao peso; ausência de infecção de ferida operatória'], condutas:['Ajustar a dose do antibiótico ao peso; profilaxia de tromboembolismo com dose ajustada ao peso e compressão mecânica obrigatória; sutura do tecido celular subcutâneo quando a espessura for superior a 2 cm; avaliação anestésica antecipada'] },
+  obesidade40:   { problema:'Obesidade grau III — risco cirúrgico, anestésico e respiratório elevado', metas:['Realizar o procedimento com planejamento cirúrgico e anestésico definidos previamente, sem complicação respiratória no pós-operatório'], condutas:['Definir antecipadamente o tipo de incisão e a retração do panículo adiposo; prever tempo cirúrgico maior e mesa/afastadores adequados; monitorização estendida no pós-operatório com cautela no uso de opioide sistêmico, priorizando analgesia multimodal e bloqueio de parede'] },
+  anemia:        { problema:'Anemia materna pré-operatória — reserva fisiológica reduzida para a perda sanguínea', metas:['Manter hemoglobina ≥ 10 g/dL antes do procedimento eletivo e obter hemograma de controle no 1º dia pós-operatório, sem necessidade de transfusão'], condutas:['Investigar a etiologia com perfil de ferro; repor ferro por via oral ou endovenosa conforme gravidade e tempo disponível; definir reserva de hemocomponentes conforme o grau; manter reposição de ferro na alta com reavaliação ambulatorial'] },
+  cardiopatia:   { problema:'Cardiopatia materna — risco de descompensação hemodinâmica periparto', metas:['Prevenir insuficiência cardíaca, arritmia e edema agudo de pulmão; manter balanço hídrico neutro e monitorização adequada ao risco'], condutas:['Ecocardiograma e parecer cardiológico prévios, com classificação de risco; definir monitorização conforme a classe de risco','Anestesia titulada em doses fracionadas, evitando queda súbita da resistência vascular; evitar sobrecarga volêmica','Administrar uterotônico em infusão lenta e diluída, evitando bolus rápido e metilergometrina; reservar leito de UTI materna'] },
+  tevPrevio:     { problema:'História de tromboembolismo venoso ou trombofilia — alto risco de evento tromboembólico puerperal', metas:['Manter anticoagulação profilática ou terapêutica conforme indicação por pelo menos 6 semanas após o parto, sem evento tromboembólico e sem hematoma neuroaxial'], condutas:['Suspender heparina de baixo peso molecular respeitando a janela mínima antes do bloqueio e reintroduzir apenas após o intervalo seguro do pós-operatório','Considerar dose intermediária ou terapêutica com parecer hematológico nas trombofilias de alto risco; manter prescrição domiciliar e orientar sinais de alarme na alta'] },
+  alergia:       { problema:'Alergia medicamentosa documentada — restrição terapêutica para profilaxia e analgesia', metas:['Evitar reação alérgica e, ainda assim, manter analgesia eficaz (escala visual analógica ≤ 3 em repouso) e profilaxia antibiótica adequada'], condutas:['Registrar o fármaco e o tipo de reação, diferenciando alergia verdadeira de intolerância; selecionar esquema alternativo de antibiótico e de analgesia conforme a restrição','Quando o esquema multimodal padrão estiver comprometido, priorizar a analgesia regional (morfina neuroaxial e/ou bloqueio de parede abdominal) como base do plano, com adjuvantes poupadores de opioide e reavaliação da dor a cada 6 h'] },
+  placentaPrevia:{ problema:'Placenta prévia — risco de hemorragia anteparto e intraoperatória', metas:['Manter perda sanguínea controlada e estabilidade hemodinâmica, com hemocomponentes disponíveis em sala'], condutas:['Confirmar a topografia placentária por ultrassonografia; planejar a histerotomia evitando a placenta; reservar hemocomponentes; cirurgião experiente escalado'] },
+  acretismo:     { problema:'Suspeita de espectro de acretismo placentário — risco de hemorragia maciça e de histerectomia periparto', metas:['Realizar o procedimento com equipe multidisciplinar e hemocomponentes disponíveis, preservando a vida materna, com decisão cirúrgica definida antecipadamente e sem lesão de trato urinário não reconhecida'], condutas:['Ultrassonografia com Doppler, complementada por ressonância quando necessário, para definir topografia e invasão; programar o nascimento em caráter eletivo com corticoterapia quando pré-termo','Acionar equipe multidisciplinar (obstetra experiente, anestesia, urologia, cirurgia, hemoterapia, UTI e neonatologia); protocolo de transfusão maciça acionável','Não tentar dequitação forçada em caso de acretismo confirmado, mantendo a placenta in situ com histerectomia planejada; consentimento explícito para histerectomia e hemotransfusão; reservar UTI materna'] },
+  cesareaPrevia: { problema:'Cesariana anterior — risco de aderências, de lesão de órgãos adjacentes e de acretismo', metas:['Realizar o procedimento sem lesão vesical ou intestinal, com tempo cirúrgico controlado'], condutas:['Rastrear acretismo por imagem quando houver placenta anterior ou prévia associada; prever adesiólise e tempo cirúrgico maior; realizar descolamento e rechaço vesical com cautela'] },
+  hppPrevia:     { problema:'Antecedente de hemorragia pós-parto — risco recorrente aumentado', metas:['Manter perda sanguínea < 1000 mL com profilaxia reforçada de atonia'], condutas:['Reservar hemocomponentes; reforçar o esquema uterotônico profilático e antecipar o limiar para as medidas de segunda linha; ácido tranexâmico disponível'] },
+  gemelar:       { problema:'Gestação múltipla — risco aumentado de atonia por sobredistensão uterina e de prematuridade', metas:['Garantir uma equipe de neonatologia por recém-nascido e manter perda sanguínea < 1000 mL'], condutas:['Confirmar corionicidade, apresentações e pesos estimados; providenciar equipes e berços aquecidos em número suficiente; profilaxia reforçada de atonia com ácido tranexâmico disponível; planejar histerotomia ampla e a ordem de extração'] },
+  prematuro34:   { problema:'Prematuridade abaixo de 34 semanas — risco de síndrome do desconforto respiratório, hemorragia intraventricular e sequela neurológica', metas:['Completar o ciclo de corticoterapia antenatal, idealmente com pelo menos 24 h antes do nascimento','Administrar sulfato de magnésio para neuroproteção fetal quando indicado pela idade gestacional e confirmar vaga em unidade neonatal antes da incisão'], condutas:['Corticoterapia antenatal conforme protocolo institucional','Sulfato de magnésio para neuroproteção fetal quando a idade gestacional for inferior a 32 semanas (algumas diretrizes estendem a indicação até 34 semanas — seguir o protocolo institucional), em esquema de ataque e manutenção até o nascimento','Confirmar vaga de UTI neonatal previamente e, se indisponível, avaliar transferência intraútero; clampeamento tardio do cordão e cuidados de termorregulação do prematuro'] },
+  prematuroTardio:{ problema:'Prematuridade tardia — risco de desconforto respiratório e de hipoglicemia neonatal', metas:['Garantir neonatologista em sala e rastreamento de glicemia do recém-nascido, com unidade neonatal disponível se necessário'], condutas:['Considerar corticoterapia antenatal se ainda não realizada e o nascimento for previsto na janela de benefício; não indicada em caso de diabetes materno pelo risco de hipoglicemia neonatal; evitar antecipação eletiva sem indicação formal'] },
+  rcf:           { problema:'Restrição de crescimento fetal, oligoâmnio ou alteração de Doppler — risco de sofrimento fetal e de acidemia ao nascer', metas:['Realizar o nascimento no momento definido pelo estadiamento do Doppler, com pH de cordão > 7,0 e Apgar de 5º minuto ≥ 7'], condutas:['Registrar percentil de crescimento, líquido amniótico e Doppler com data; definir o momento do parto pelo estadiamento; reavaliar a vitalidade imediatamente antes do bloqueio','Neonatologista presente, coleta de gasometria de cordão e preparo para recém-nascido de baixo peso'] },
+  macrossomia:   { problema:'Suspeita de macrossomia fetal — risco de atonia, de extensão da histerotomia e de complicação metabólica neonatal', metas:['Realizar extração sem tocotraumatismo, com perda sanguínea < 1000 mL e rastreamento de hipoglicemia no recém-nascido'], condutas:['Registrar peso fetal estimado, método e data da estimativa; planejar histerotomia ampla; profilaxia reforçada de atonia; neonatologia comunicada'] },
+  rhNegativo:    { problema:'Gestante RhD negativo não sensibilizada — risco de aloimunização', metas:['Administrar imunoglobulina anti-D em até 72 h do parto caso o recém-nascido seja RhD positivo, com registro em prontuário'], condutas:['Confirmar tipagem materna, Coombs indireto e tipagem do sangue de cordão; conferir e registrar se a profilaxia anteparto de 28 semanas foi realizada; avaliar necessidade de dose adicional em caso de suspeita de hemorragia feto-materna volumosa'] },
+  isoimunizacao: { problema:'Isoimunização Rh estabelecida — risco de doença hemolítica perinatal', metas:['Garantir assistência neonatal com suporte hemoterápico disponível, incluindo possibilidade de exsanguineotransfusão'], condutas:['Imunoglobulina anti-D não indicada; reservar hemocomponente compatibilizado para o recém-nascido; coletar do cordão hematócrito, bilirrubinas, Coombs direto e gasometria; neonatologia e hemoterapia comunicadas'] },
+  corioamnionite:{ problema:'Corioamnionite ou rotura prolongada de membranas — risco de sepse materna e neonatal e de endometrite', metas:['Iniciar antibioticoterapia (terapêutica, não apenas profilática) antes da incisão e manter-se afebril em 48 h, sem sepse materna'], suprimeConduta:['isc'], condutas:['Antibioticoterapia plena de amplo espectro, que SUBSTITUI a antibioticoprofilaxia cirúrgica em dose única, com cobertura para anaeróbios acrescentada no clampeamento e mantida no pós-operatório conforme a resposta clínica; azitromicina adjuvante indicada','Antissepsia da pele com clorexidina alcoólica, normotermia e curativo oclusivo por 24 a 48 h mantidos como medidas de prevenção de infecção de ferida','Coletar culturas se houver critério de sepse; preparo vaginal com antisséptico; comunicar a neonatologia para avaliação de sepse neonatal; vigilância reforçada de atonia'] },
+  sifilis:       { problema:'Sífilis materna — risco de sífilis congênita', metas:['Documentar o tratamento materno e do parceiro e a classificação de adequação do tratamento; garantir avaliação e tratamento do recém-nascido conforme protocolo; notificação compulsória realizada'], condutas:['Registrar titulação de VDRL/RPR materna do parto e a data e o esquema do tratamento com penicilina benzatina; classificar o tratamento como adequado ou inadequado','Comunicar a neonatologia para coleta de VDRL do sangue periférico do recém-nascido e avaliação complementar conforme a classificação; notificar o caso'] },
+  dpp:           { problema:'Descolamento prematuro de placenta — risco de hemorragia, coagulopatia de consumo e comprometimento fetal agudo', metas:['Realizar a resolução em caráter de emergência com estabilização hemodinâmica materna e sem coagulopatia não corrigida'], condutas:['Acionar protocolo de hemorragia com reserva imediata de hemocomponentes, incluindo plasma e fibrinogênio; coletar coagulograma seriado e fibrinogênio','Dois acessos venosos calibrosos e ácido tranexâmico precoce; atenção à atonia e ao útero de Couvelaire, com limiar baixo para medidas de segunda linha','Comunicar neonatologia para recepção de recém-nascido potencialmente asfixiado, com coleta de gasometria de cordão'] },
+  recusaTransf:  { problema:'Recusa formal de hemotransfusão — restrição terapêutica em caso de hemorragia', metas:['Respeitar a manifestação de vontade documentada e minimizar a perda sanguínea, mantendo hemoglobina em nível seguro sem uso de hemocomponentes'], condutas:['Registrar em prontuário a recusa formal, seu alcance (quais hemocomponentes e alternativas são aceitos) e a ciência dos riscos, com termo assinado','Otimizar a hemoglobina no pré-operatório com ferro endovenoso; ácido tranexâmico precoce; considerar recuperação intraoperatória de sangue quando aceita pela paciente','Cirurgião experiente escalado, limiar reduzido para medidas hemostáticas precoces e comunicação prévia com hemoterapia e UTI'] },
+  obitoFetal:    { problema:'Óbito fetal — resolução da gestação e suporte ao luto materno', metas:['Realizar a resolução com segurança materna, garantir investigação etiológica e assegurar suporte psicológico e inibição da lactação antes da alta'], suprime:['fetal','aleitamento'], condutas:['Coletar investigação etiológica conforme protocolo (exame do recém-nascido e da placenta, anatomopatológico, cariótipo quando indicado, rastreio materno de trombofilia, infecções e diabetes)','Prescrever inibição farmacológica da lactação e orientar cuidados com o ingurgitamento; acionar equipe de psicologia e assistência social','Avaliar coagulação materna em óbito retido de longa data; acolher a família quanto à despedida e aos trâmites de declaração de óbito'] },
+  gbs:           { problema:'Colonização por estreptococo do grupo B — risco de sepse neonatal precoce', metas:['Garantir profilaxia intraparto adequada quando indicada e comunicar o status ao serviço de neonatologia'], condutas:['Em cesariana eletiva com membranas íntegras e fora de trabalho de parto a profilaxia específica não é necessária, sendo suficiente a antibioticoprofilaxia cirúrgica; havendo trabalho de parto ou rotura de membranas, instituir profilaxia específica conforme protocolo e histórico de alergia'] },
+  hiv:           { problema:'Infecção materna pelo HIV — risco de transmissão vertical', metas:['Documentar a carga viral do terceiro trimestre, prevenir a transmissão vertical e garantir o início da profilaxia do recém-nascido nas primeiras horas','Assegurar a inibição farmacológica da lactação e o fornecimento de fórmula láctea até a alta, com orientação documentada sobre a contraindicação do aleitamento'], suprime:['aleitamento'], condutas:['Manter terapia antirretroviral; definir a via de parto e a indicação de zidovudina endovenosa conforme a carga viral e o protocolo do Ministério da Saúde','Extração com membranas íntegras quando possível, evitando procedimentos invasivos; o clampeamento imediato do cordão SUBSTITUI a conduta de clampeamento oportuno','Aleitamento materno contraindicado no Brasil: prescrever inibição da lactação e garantir fórmula láctea; profilaxia antirretroviral do recém-nascido; contato pele a pele permitido, sem amamentação'] },
+  hepatite:      { problema:'Hepatite viral materna — risco de transmissão vertical e ocupacional', metas:['Garantir imunoprofilaxia do recém-nascido nas primeiras 12 h quando indicada e encaminhamento para seguimento sorológico'], condutas:['Na hepatite B, imunoglobulina específica e vacina para o recém-nascido nas primeiras 12 h, com avaliação de carga viral materna; aleitamento permitido','Na hepatite C, sem intervenção específica sobre a via de parto, com aleitamento permitido e seguimento sorológico do lactente; precauções universais para a equipe'] },
+  intraparto:    { problema:'Cesariana em trabalho de parto — risco aumentado de atonia, de extensão da histerotomia e de endometrite', metas:['Realizar o procedimento sem extensão não controlada da histerotomia e sem lesão vesical, com perda < 1000 mL'], condutas:['Azitromicina adjuvante à antibioticoprofilaxia e preparo vaginal com antisséptico; esvaziamento vesical','Planejar a histerotomia considerando a distensão do segmento e definir previamente a técnica para desprendimento de polo cefálico insinuado; profilaxia reforçada de atonia e revisão cuidadosa dos ângulos'] },
+  laqueadura:    { problema:'Desejo de contracepção cirúrgica definitiva', metas:['Realizar a laqueadura tubária no mesmo ato, cumpridos integralmente os requisitos legais e documentais'], condutas:['Conferir e registrar o enquadramento na Lei 9.263/96 com a redação dada pela Lei 14.443/2022: idade mínima de 21 anos ou pelo menos dois filhos vivos; manifestação de vontade em documento escrito com antecedência mínima de 60 dias; aconselhamento sobre irreversibilidade e alternativas contraceptivas documentado. A realização durante a cesariana é permitida, mas o prazo de 60 dias permanece obrigatório'] },
+  saf:           { problema:'Síndrome antifosfolípide ou lúpus eritematoso sistêmico — risco trombótico, de pré-eclâmpsia e de insuficiência placentária', metas:['Manter anticoagulação conforme o protocolo da síndrome, sem evento trombótico e sem hematoma neuroaxial; vigiar sinais de pré-eclâmpsia e de atividade da doença'], condutas:['Definir com hematologia e reumatologia o esquema de anticoagulação periparto e sua reintrodução no puerpério, habitualmente mantido por 6 semanas','Manter ácido acetilsalicílico conforme indicação até o momento definido no pré-natal; considerar corticoterapia de estresse se uso crônico de corticoide','Vigilância de pré-eclâmpsia e de trombose; respeitar as janelas de segurança do bloqueio neuroaxial'] },
+  saudeMental:   { problema:'Vulnerabilidade psicossocial ou transtorno mental — risco de sofrimento psíquico puerperal', metas:['Rastrear sintomas depressivos e ansiosos antes da alta e assegurar encaminhamento e rede de apoio definidos'], condutas:['Aplicar rastreamento de depressão puerperal antes da alta; acionar psicologia, psiquiatria ou serviço social conforme necessidade','Revisar a compatibilidade dos psicofármacos em uso com a lactação; registrar rede de apoio e plano de seguimento'] }
+};
+
+const PT_CENARIOS = [
+  { id:'preeclampsia', label:'Pré-eclâmpsia / hipertensão gestacional', grupo:'Condições maternas', auto:() => chk('rx-co-pe') },
+  { id:'hellp', label:'HELLP / eclâmpsia', grupo:'Condições maternas' },
+  { id:'diabetes', label:'Diabetes (gestacional ou prévio)', grupo:'Condições maternas', auto:() => chk('rx-co-dm') },
+  { id:'obesidade', label:'Obesidade (IMC 30–39,9)', grupo:'Condições maternas', auto:() => { const i = imcPlano(); return i >= 30 && i < 40; } },
+  { id:'obesidade40', label:'Obesidade grau III (IMC ≥ 40)', grupo:'Condições maternas', auto:() => imcPlano() >= 40 },
+  { id:'anemia', label:'Anemia', grupo:'Condições maternas', auto:() => chk('rx-co-anemia') },
+  { id:'cardiopatia', label:'Cardiopatia materna', grupo:'Condições maternas' },
+  { id:'tevPrevio', label:'TEV prévio / trombofilia', grupo:'Condições maternas', auto:() => chk('tev-previo') || chk('tev-trombofilia') },
+  { id:'saf', label:'Síndrome antifosfolípide / LES', grupo:'Condições maternas' },
+  { id:'saudeMental', label:'Vulnerabilidade psicossocial / transtorno mental', grupo:'Condições maternas' },
+  { id:'recusaTransf', label:'Recusa formal de hemotransfusão', grupo:'Condições maternas', auto:() => v('pt-hemo').indexOf('Recusa') === 0 },
+  { id:'alergia', label:'Alergia medicamentosa relevante', grupo:'Condições maternas', auto:() => chk('rx-al-dipirona') || chk('rx-al-aine') || chk('rx-al-opioide') || chk('rx-al-cefalo') },
+  { id:'placentaPrevia', label:'Placenta prévia', grupo:'Placentação e hemorragia' },
+  { id:'acretismo', label:'Suspeita de acretismo (PAS)', grupo:'Placentação e hemorragia' },
+  { id:'cesareaPrevia', label:'Cesárea prévia / iteratividade', grupo:'Placentação e hemorragia', auto:() => Number(v('pt-c')) >= 1 },
+  { id:'hppPrevia', label:'Hemorragia pós-parto prévia', grupo:'Placentação e hemorragia' },
+  { id:'dpp', label:'Descolamento prematuro de placenta', grupo:'Placentação e hemorragia' },
+  { id:'gemelar', label:'Gestação gemelar / múltipla', grupo:'Condições fetais', auto:() => chk('dc-gemelar') },
+  { id:'prematuro34', label:'Prematuridade < 34 semanas', grupo:'Condições fetais' },
+  { id:'prematuroTardio', label:'Prematuridade tardia (34s–36s6d)', grupo:'Condições fetais' },
+  { id:'rcf', label:'RCF / oligoâmnio / Doppler alterado', grupo:'Condições fetais' },
+  { id:'macrossomia', label:'Suspeita de macrossomia', grupo:'Condições fetais' },
+  { id:'rhNegativo', label:'RhD negativo não sensibilizada', grupo:'Condições fetais' },
+  { id:'isoimunizacao', label:'Isoimunização Rh estabelecida', grupo:'Condições fetais' },
+  { id:'obitoFetal', label:'Óbito fetal', grupo:'Condições fetais' },
+  { id:'corioamnionite', label:'Corioamnionite / bolsa rota > 18 h', grupo:'Infecção' },
+  { id:'gbs', label:'Estreptococo do grupo B positivo', grupo:'Infecção' },
+  { id:'hiv', label:'HIV', grupo:'Infecção' },
+  { id:'hepatite', label:'Hepatite B ou C', grupo:'Infecção' },
+  { id:'sifilis', label:'Sífilis materna', grupo:'Infecção' },
+  { id:'intraparto', label:'Cesárea em trabalho de parto', grupo:'Contexto do procedimento', auto:() => v('dc-tp') === 'Sim' },
+  { id:'laqueadura', label:'Laqueadura tubária solicitada', grupo:'Contexto do procedimento', auto:() => chk('pt-cons-laqueadura') || chk('dc-laqueadura') }
+];
+
+const PT_SOLICITACOES = [
+  'Pré-operatório: confirmar jejum e horário do último alimento; banho pré-operatório; não realizar tricotomia com lâmina (usar tricotomizador elétrico imediatamente antes, se necessária); conferir exames, pulseira de identificação e alergias.',
+  'Pré-operatório: garantir acesso venoso periférico calibroso e registrar o horário de inserção da sonda vesical.',
+  'Intraoperatório: aplicar o checklist de Cirurgia Segura da OMS nas três etapas; posicionar com deslocamento uterino à esquerda; manter aquecimento ativo com meta de temperatura ≥ 36 °C; conferir contagem de compressas e instrumentais.',
+  'Pós-operatório imediato: monitorização em recuperação anestésica com avaliação do fundo uterino e quantificação de lóquios a cada 15 minutos na primeira hora e a cada 30 minutos na segunda.',
+  'Comunicar imediatamente ao médico: útero amolecido, sangramento superior a um absorvente por hora, queda da pressão sistólica maior que 20%, frequência cardíaca acima de 110 bpm, temperatura ≥ 38 °C ou dor não controlada.',
+  'Prevenção de queda: manter grades elevadas e campainha ao alcance; primeira deambulação assistida e somente após regressão completa do bloqueio motor; reavaliar risco de queda a cada turno.',
+  'Retirar a sonda vesical entre 6 e 12 h do pós-operatório se estável, vigiando micção espontânea em até 6 h e ausência de globo vesical.',
+  'Progressão precoce de dieta e deambulação em até 12 a 24 h, conforme protocolo ERAS.',
+  'Manter contato pele a pele, alojamento conjunto e apoio ao aleitamento em livre demanda; registrar dificuldades de pega.',
+  'Curativo oclusivo por 24 a 48 h; após, manter a ferida limpa, seca e descoberta, comunicando sinais flogísticos, secreção ou deiscência.'
+];
+
+function imcPlano(){
+  const peso = parseFloat(String(v('pt-peso')).replace(',','.'));
+  const alt = parseFloat(String(v('pt-altura')).replace(',','.')) / 100;
+  if (peso > 0 && alt > 0) return peso / (alt * alt);
+  return 0;
+}
+function calcularIMCPlano(){
+  const i = imcPlano();
+  setV('pt-imc', i > 0 ? i.toFixed(1) + (i >= 40 ? ' (obesidade grau III)' : i >= 30 ? ' (obesidade)' : '') : '');
+  if (v('pt-peso')) setV('rx-peso', v('pt-peso'));
+  if (v('pt-altura')) setV('rx-altura', v('pt-altura'));
+  if ($('rx-imc') && i > 0) calcularIMC();
+  atualizarCenarios();
+}
+function montarCenarios(){
+  const cont = $('ptCenarios');
+  if (!cont) return;
+  const grupos = [];
+  PT_CENARIOS.forEach(c => { if (grupos.indexOf(c.grupo) < 0) grupos.push(c.grupo); });
+  cont.innerHTML = '';
+  grupos.forEach(g => {
+    const bloco = document.createElement('div');
+    bloco.style.marginBottom = '12px';
+    let html = '<p style="font-weight:700;font-size:.82rem;color:var(--c-ink-500);margin-bottom:4px">' + esc(g) + '</p>';
+    PT_CENARIOS.filter(c => c.grupo === g).forEach(c => {
+      html += '<div class="check-row"><input type="checkbox" id="ptc-' + c.id + '" onchange="marcarManual(\'' + c.id + '\')"><label for="ptc-' + c.id + '">' + esc(c.label) + '<span class="hint" id="ptc-' + c.id + '-auto"></span></label></div>';
+    });
+    bloco.innerHTML = html;
+    cont.appendChild(bloco);
+  });
+}
+const PT_MANUAIS = {};
+function marcarManual(id){ PT_MANUAIS[id] = true; salvarFormulario(); }
+function atualizarCenarios(){
+  PT_CENARIOS.forEach(c => {
+    const el = $('ptc-' + c.id);
+    if (!el) return;
+    const marca = $('ptc-' + c.id + '-auto');
+    if (c.auto && c.auto()) {
+      if (!PT_MANUAIS[c.id]) el.checked = true;
+      if (marca) marca.textContent = ' (auto)';
+    } else if (marca) marca.textContent = '';
+  });
+}
+function cenariosAtivos(){
+  const ativos = [];
+  const car = v('pt-carater');
+  if (car === 'Urgência') ativos.push('urgencia');
+  else if (car.indexOf('Emergência') === 0) ativos.push('emergencia');
+  PT_CENARIOS.forEach(c => { if (chk('ptc-' + c.id)) ativos.push(c.id); });
+  // HELLP/eclâmpsia implica o manejo da pré-eclâmpsia (sulfato de magnésio e controle pressórico)
+  if (ativos.indexOf('hellp') >= 0 && ativos.indexOf('preeclampsia') < 0) ativos.push('preeclampsia');
+  return ativos;
+}
+function puxarDadosParaPlano(){
+  const pares = [['dc-nome','pt-nome'],['dc-registro','pt-registro'],['ev-leito','pt-leito'],['dc-idade','pt-idade'],['dc-g','pt-g'],['dc-p','pt-p'],['dc-c','pt-c'],['dc-a','pt-a'],['dc-ig','pt-ig'],['dc-data','pt-data'],['dc-carater','pt-carater'],['dc-indicacao','pt-indicacao'],['rx-peso','pt-peso'],['rx-altura','pt-altura'],['dc-anestesia','pt-anestesia-prog']];
+  let n = 0;
+  pares.forEach(p => { const val = v(p[0]); if (val) { setV(p[1], val); n++; } });
+  calcularIMCPlano(); atualizarCenarios(); atualizarBanner(); salvarFormulario();
+  toast(n ? n + ' campo(s) importado(s)' : 'Nada preenchido nas outras abas ainda');
+}
+function syncPT(id){
+  const mapa = { 'pt-leito':['ev-leito','rx-leito'], 'pt-idade':['dc-idade'], 'pt-g':['dc-g'], 'pt-p':['dc-p'], 'pt-c':['dc-c'], 'pt-a':['dc-a'], 'pt-ig':['dc-ig'], 'pt-data':['dc-data'], 'pt-carater':['dc-carater'], 'pt-indicacao':['dc-indicacao'], 'pt-peso':['rx-peso'], 'pt-altura':['rx-altura'] };
+  const destinos = mapa[id];
+  if (destinos) destinos.forEach(d => { if ($(d)) setV(d, v(id)); });
+  if (id === 'pt-peso' || id === 'pt-altura') calcularIMC();
+  if (id === 'pt-c') atualizarCenarios();
+  atualizarBanner();
+}
+
+let ULTIMO_PLANO = null;
+function gerarPlano(){
+  const ativos = cenariosAtivos();
+  const problemas = [], metas = [], condutas = [];
+  const addMod = key => {
+    const m = PLANO_MOD[key];
+    if (!m) return;
+    if (problemas.indexOf(m.problema) < 0) problemas.push(m.problema);
+    m.metas.forEach(x => { if (metas.indexOf(x) < 0) metas.push(x); });
+    m.condutas.forEach(x => { if (condutas.indexOf(x) < 0) condutas.push(x); });
+  };
+  // modificadores podem suprimir problemas-base contraditórios (ex.: HIV suprime aleitamento)
+  const suprimidos = {}, supCondutas = {};
+  ativos.forEach(k => {
+    const m = PLANO_MOD[k];
+    if (!m) return;
+    (m.suprime || []).forEach(x => { suprimidos[x] = true; });
+    (m.suprimeConduta || []).forEach(x => { supCondutas[x] = true; });
+  });
+  const urgente = ativos.indexOf('urgencia') >= 0 || ativos.indexOf('emergencia') >= 0;
+  const obito = ativos.indexOf('obitoFetal') >= 0;
+  PLANO_BASE.forEach(p => {
+    if (suprimidos[p.id]) return;
+    let prob = p.problema;
+    if (p.id === 'resolucao') {
+      prob = 'Gestação' + (v('pt-ig') ? ' de ' + v('pt-ig') : '') + ' com indicação de resolução por via alta (' + (v('pt-indicacao') || '[INDICACAO]') + ')';
+    }
+    problemas.push(prob);
+    p.metas.forEach(x => {
+      if (p.id === 'resolucao') {
+        if (obito) x = 'Realizar a resolução da gestação com segurança materna, sem intercorrências cirúrgicas';
+        else if (urgente) x = x.replace('na data programada', 'no menor tempo seguro possível');
+      }
+      metas.push(x);
+    });
+    if (!supCondutas[p.id]) p.condutas.forEach(x => condutas.push(x));
+  });
+  ativos.forEach(addMod);
+
+  const SEP = '________________________________________\n';
+  const nome = v('pt-nome') || '[NOME DA PACIENTE]';
+  const reg = v('pt-registro') || '[REGISTRO]';
+  const blocoProblemas = problemas.map(p => '- ' + p).join('\n');
+  const blocoMetas = metas.map(m => '- ' + m + ';').join('\n');
+
+  let s = '';
+  s += 'PLANO TERAPÊUTICO MÉDICO — CESARIANA\n';
+  if (CONFIG.hospital) s += CONFIG.hospital + '\n';
+  s += SEP;
+  s += 'Paciente: ' + nome + '  —  Registro/Atendimento: ' + reg + (v('pt-leito') ? '  —  Leito: ' + v('pt-leito') : '') + '\n';
+  const dem = [];
+  if (v('pt-idade')) dem.push(v('pt-idade') + ' anos');
+  if (v('pt-g')) dem.push('G' + v('pt-g') + 'P' + (v('pt-p')||'0') + 'C' + (v('pt-c')||'0') + 'A' + (v('pt-a')||'0'));
+  if (v('pt-ig')) dem.push('IG ' + v('pt-ig'));
+  if (v('pt-imc')) dem.push('IMC ' + v('pt-imc'));
+  if (dem.length) s += dem.join('  —  ') + '\n';
+  s += 'Data prevista do procedimento: ' + (v('pt-data') ? dataBR(v('pt-data')) : '[DATA]') + '  —  Caráter: ' + v('pt-carater') + '\n';
+  s += 'Indicação: ' + (v('pt-indicacao') || '[INDICACAO]') + '\n';
+  s += 'Fundamentação: ' + (v('pt-fundamentacao') || '[FUNDAMENTAR A INDICACAO CLINICA]') + '\n';
+  if (v('pt-cid')) s += 'CID-10: ' + v('pt-cid') + '\n';
+  if (v('pt-convenio')) s += 'Convênio/autorização: ' + v('pt-convenio') + '\n';
+  if (v('pt-outras-comorb')) s += 'Outras condições: ' + v('pt-outras-comorb') + '\n';
+  s += SEP;
+  s += 'PROBLEMA\n' + blocoProblemas + '\n';
+  s += SEP;
+  s += 'META\n' + blocoMetas + '\n';
+  s += SEP;
+  s += 'CONDUTA E PLANEJAMENTO PRÉ-OPERATÓRIO\n';
+  let n = 1;
+  condutas.forEach(c => { s += (n++) + '. ' + c + (c.slice(-1) === '.' ? '' : '.') + '\n'; });
+  const pre = [];
+  if (v('pt-jejum')) pre.push('Jejum: ' + v('pt-jejum') + (v('pt-jejum-hora') ? '. Último alimento às ' + v('pt-jejum-hora') : ''));
+  if (v('pt-exames')) pre.push('Exames pré-operatórios: ' + v('pt-exames'));
+  if (v('pt-hemo')) pre.push('Hemocomponentes: ' + v('pt-hemo'));
+  if (v('pt-acesso')) pre.push('Acesso venoso: ' + v('pt-acesso'));
+  if (v('pt-anestesia-prog')) pre.push('Anestesia programada: ' + v('pt-anestesia-prog'));
+  pre.push('UTI materna: ' + v('pt-uti-materna') + '. Unidade neonatal: ' + v('pt-uti-neo'));
+  pre.push('Assistência neonatal em sala: ' + v('pt-neo-equipes') + (chk('pt-neo-comunicada') ? '; neonatologia comunicada previamente' : '; NEONATOLOGIA AINDA NAO COMUNICADA'));
+  if (v('pt-materiais')) pre.push('Materiais e recursos especiais: ' + v('pt-materiais'));
+  const cons = [];
+  if (chk('pt-cons-cesarea')) cons.push('cesariana');
+  if (chk('pt-cons-anestesia')) cons.push('anestésico/avaliação pré-anestésica');
+  if (chk('pt-cons-laqueadura')) cons.push('laqueadura (Lei 9.263/96)');
+  if (chk('pt-cons-histerectomia')) cons.push('histerectomia e hemotransfusão');
+  pre.push(cons.length ? 'Consentimentos obtidos: ' + cons.join('; ') : 'CONSENTIMENTOS: [PENDENTE DE REGISTRO]');
+  if (chk('pt-checklist-oms')) pre.push('Checklist de Cirurgia Segura da OMS previsto nas três etapas');
+  pre.forEach(x => { s += (n++) + '. ' + x + '.\n'; });
+  if (chk('pt-solicitacoes')) {
+    s += SEP;
+    s += 'SOLICITAÇÕES À EQUIPE ASSISTENCIAL\n';
+    PT_SOLICITACOES.forEach(x => { s += '- ' + x + '\n'; });
+  }
+  s += SEP;
+  s += 'METAS DE ALTA E SEGUIMENTO\n';
+  if (v('pt-internacao')) s += '- Previsão de internação: ' + v('pt-internacao') + '.\n';
+  if (v('pt-criterios-alta')) s += '- Critérios de alta: ' + v('pt-criterios-alta') + '.\n';
+  if (v('pt-seguimento')) s += '- Seguimento: ' + v('pt-seguimento') + '.\n';
+  if (v('pt-reavaliacao')) s += '- Reavaliação: ' + v('pt-reavaliacao') + '.\n';
+  s += SEP;
+  if (chk('pt-ref-enfermagem')) s += 'Plano médico complementar ao plano de cuidados de enfermagem registrado nesta data; metas pactuadas com as equipes de enfermagem, anestesiologia e neonatologia, com reavaliação multiprofissional diária.\n\n';
+  s += 'Plano elaborado em ' + dataBR(hojeISO()) + ' às ' + agoraHora() + ' por ' + (CONFIG.medico || '') + ' — ' + (CONFIG.crm || '') + '.\n';
+  s += 'Documento gerado com ferramenta local de apoio; revisado e assinado sob responsabilidade do médico assistente e sujeito a revisão conforme a evolução clínica.\n';
+
+  ULTIMO_PLANO = { problemas: blocoProblemas, metas: blocoMetas };
+  abrirModal('Plano Terapêutico — pré-visualização', s, true);
+}
+function copiarParte(parte){
+  if (!ULTIMO_PLANO) return;
+  let t = parte === 'problemas' ? ULTIMO_PLANO.problemas : ULTIMO_PLANO.metas;
+  if (chk('cfg-ascii') || CONFIG.prefAscii) t = toAscii(t);
+  const ok = () => toast(parte === 'problemas' ? 'Coluna PROBLEMA copiada' : 'Coluna META copiada');
+  const falha = () => { fallbackCopiar(t) ? ok() : toast('Não foi possível copiar — use Ctrl+C', true); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok).catch(falha);
+  else falha();
+}
+
 /* ================= PRESETS DE TÉCNICA ================= */
 const TECNICAS = {
   tradicional: {
@@ -2127,11 +2579,13 @@ function init(){
   montarTabelaSuturas();
   montarEva();
   montarTev();
+  montarCenarios();
   initCombos();
   aplicarConfigNaUI();
   const restaurado = restaurarFormulario();
   if (!restaurado) {
     setV('dc-data', hojeISO());
+    setV('pt-data', hojeISO());
     setV('ev-data-exame', hojeISO());
     setV('ev-hora-exame', agoraHora());
     aplicarPadroesCombos();
@@ -2140,6 +2594,8 @@ function init(){
   }
   if (!restaurado) montarRxItens();
   calcularIMC();
+  calcularIMCPlano();
+  atualizarCenarios();
   atualizarUtero();
   atualizarBanner();
   checarHPP(); checarPA();
