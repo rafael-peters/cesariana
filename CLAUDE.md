@@ -4,7 +4,7 @@ Guia para trabalhar neste repositório. Leia antes de editar.
 
 ## O que é
 
-App médico **single-file** para gerar texto de **plano terapêutico**, **descrição cirúrgica de cesariana**, **evolução pós-operatória** e **prescrição padrão**, que o médico copia e cola no prontuário. Autor/usuário: **Dr. Rafael Peters — CREMERS 19676**, obstetra, hospital brasileiro sem sistema robusto de prontuário.
+App médico **single-file** que cobre o **episódio obstétrico completo**: nota de **admissão**, **plano terapêutico**, descrição de **cesariana**, descrição de **parto vaginal**, **evolução pós-parto** (por via), **prescrição** e **alta** (sumário + orientações à paciente + atestados). O médico gera o texto e cola no prontuário. Autor/usuário: **Dr. Rafael Peters — CREMERS 19676**, obstetra, hospital brasileiro sem sistema robusto de prontuário.
 
 Todo o app vive em **`index.html`** (HTML + CSS + JS inline, ~150 KB). Nada mais é código-fonte: `arquivo/` guarda versões antigas (referência), o `.docx` é a síntese de evidências.
 
@@ -21,17 +21,27 @@ São o mesmo arquivo. Não crie build, não separe versões, não duplique.
 1. **Zero recursos externos.** Nada de Google Fonts, CDN, imagens/scripts remotos. Fontes = system stack. Ícones/ilustrações = **SVG inline**. Qualquer `http(s)://` em `src`/`href` quebra o offline.
 2. **Funciona em `file://` e navegadores antigos de hospital.** Sem `?.`/`??`, sem APIs sem guarda. Clipboard tem fallback `execCommand` (não remover). `localStorage`/`sessionStorage` sempre em `try/catch`. `matchMedia` com `addEventListener`/`addListener`. CSS: usar `top/right/bottom/left` em vez de `inset`.
 3. **Datas à prova de fuso.** Nunca `new Date('YYYY-MM-DD')` (parseia em UTC → sai 1 dia a menos no BRT). Usar parse manual (`dataBR`, `hojeISO`) ou `new Date(iso+'T12:00:00')`.
-4. **LGPD.** Nunca persistir dados de paciente. `localStorage` (chave `cesariana_v3_config`) guarda só listas/equipe/preferências; `sessionStorage` (`cesariana_v3_form`) é rascunho volátil da sessão e é apagado em "Nova paciente".
+4. **LGPD.** Nunca persistir dados de paciente. `localStorage` (chave `cesariana_v3_config`) guarda só listas/equipe/preferências; `sessionStorage` (`cesariana_v3_form`) é rascunho volátil da sessão e é apagado em "Nova paciente". **Exceção deliberada:** o Caso Portátil exporta um `.ces` com dados de paciente **cifrado** (PBKDF2 150k + AES-256-GCM, senha mínima 8 chars, nunca armazenada) — é a ponte consultório→hospital sem servidor; não enfraquecer a criptografia nem criar exportação em claro.
 5. **Segurança do prontuário.** Frases do texto são **condicionais** aos campos — nunca imprimir "sem intercorrências"/"evolução satisfatória" de forma fixa. Manter banner da paciente, botão "Nova paciente" e o aviso de `[PLACEHOLDER]` no modal.
 6. **Conteúdo clínico é sugestão.** Todo texto gerado traz o disclaimer de revisão médica. Não remover.
 
 ## Mapa do `index.html`
 
 - **CSS**: tokens em `:root` (+ `[data-theme]` claro/escuro) → topbar/tabs → banner → cards colapsáveis → combos → tabela de suturas → EVA → modal → `@media print` → responsivo.
-- **HTML**: `<header>` (marca, tema, 5 abas) → banner paciente → `<main>` com `#tab-plano`, `#tab-descricao`, `#tab-evolucao`, `#tab-prescricao`, `#tab-config` → modais (preview e confirmação) → toast → footer.
+- **HTML**: `<header>` (marca, tema, 8 abas) → banner paciente (+ faixa de alergias + botões do Caso Portátil) → `<main>` com `#tab-admissao`, `#tab-plano`, `#tab-descricao` (cesárea), `#tab-parto` (vaginal), `#tab-evolucao`, `#tab-prescricao`, `#tab-alta`, `#tab-config` → modais (preview, confirmação, caso) → toast → footer.
 - **JS** (blocos): CONFIG (`CONFIG_PADRAO`/`carregarConfig`/`salvarConfig`) · utils (`v`/`setV`/`chk`/`dataBR`/`toAscii`/`esc`) · tema · tabs/cards · combos editáveis · banner/`syncPaciente`/`novaPaciente`/`limparAba` · EVA · tabela de suturas (`CAMADAS`) · útero SVG + alertas · clipboard/modal/toast · autosave · **plano terapêutico (`PLANO_BASE`/`PLANO_MOD`/`PT_CENARIOS`/`gerarPlano`)** · **presets de técnica (`TECNICAS`)** · **`gerarDescricao`** · evolução (`gerarEvolucao`) · prescrição (`rxTemplates`/`gerarPrescricao`/escore TEV/`doseEnoxa`) · config UI · `init`.
 
-## Plano Terapêutico: por que é a primeira aba
+## v4 — blocos novos (resumo para quem for editar)
+
+- **Admissão** (`ad-`): sorologias, GBS, toque com **índice de Bishop** (`calcularBishop`), condutas (`AD_CONDUTAS`), `gerarAdmissao`. A avaliação de risco reusa `PT_CENARIOS` (fonte única).
+- **Parto vaginal** (`pv-`): presets em `PARTOS` (espontâneo/induzido/vácuo/fórceps/OASIS), `PV_RESET` evita vazamento entre presets, `perineoGrau()` decide blocos de reparo, `gerarParto` com condutas pós-OASIS (RCOG GTG 29).
+- **Evolução por via**: `ev-via` (cesarea/vaginal/oasis) ramifica `gerarEvolucao` (FO×períneo, SVD/curativo só cesárea, itens pós-OASIS). `atualizarViaEvolucao()` sincroniza os grupos visuais — chamar após limpar/restaurar.
+- **Alta** (`al-`): `AL_DOC` seleciona sumário/orientações/atestado; `CID_CENARIO` sugere diagnósticos pelos cenários; CID em atestado só com `al-cid-autorizado` (CFM 2.381/2024).
+- **Guardas clínicas transversais**: `cenarioAtivo('hiv')` e `cenarioAtivo('obitoFetal')` suprimem/trocam amamentação, "Parabéns", seção RN e alertas neonatais em evolução/sumário/orientações. **Todo texto novo sobre aleitamento/RN deve passar por essas guardas.**
+- **Caso Portátil**: `exportarCaso`/`importarCaso` cifram o dump do `sessionStorage`; após importar, chamar `sincronizarUIaposRestauro()` (nunca `alergiaMudou`/`montarRxItens`, que descartariam edições restauradas da prescrição).
+- Smoke tests: `scratchpad/smoke.js` … `smoke6.js` (6 suítes; a 6 cobre v4 + roundtrip AES real).
+
+## Plano Terapêutico: por que é a primeira aba do fluxo do MV
 
 O prontuário do hospital (MV PEP) **bloqueia a Descrição Cirúrgica** até existir o documento "Plano Terapêutico", que tem colunas PROBLEMA e META. Por isso a aba vem primeiro e alimenta as demais (`syncPT`).
 

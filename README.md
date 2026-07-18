@@ -2,7 +2,10 @@
 
 **Dr. Rafael Peters | CREMERS 19676**
 
-Sistema completo em **um único arquivo HTML** (`index.html`) para gerar, copiar e colar no prontuário:
+Sistema completo em **um único arquivo HTML** (`index.html`) que cobre o **episódio obstétrico inteiro** — da admissão à alta — gerando texto para copiar e colar no prontuário:
+
+**Novidades v4:** aba de **Admissão** (com índice de Bishop automático), **Parto Vaginal** completo (espontâneo, induzido, vácuo, fórceps e reparo OASIS conforme RCOG), **Evolução por via de parto**, aba de **Alta** (sumário, orientações à paciente em linguagem leiga e 5 atestados/declarações) e o **Caso Portátil** 🔐 — exporte o caso num arquivo cifrado (AES-256 + senha) no consultório e importe no hospital, sem servidor e sem expor dados (LGPD).
+
 
 0. **Plano Terapêutico** — documento exigido pelo prontuário eletrônico antes da descrição cirúrgica, no formato PROBLEMA/META. Gera o plano **médico** (complementar ao da enfermagem) com metas mensuráveis, adaptando-se a 32 cenários clínicos (pré-eclâmpsia, HELLP, diabetes, obesidade, acretismo, prematuridade, HIV, sífilis, óbito fetal, recusa de transfusão, alergias e outros), além de planejamento pré-operatório, solicitações à equipe e critérios de alta;
 1. **Descrição Cirúrgica** de cesariana — 7 presets de técnica (Tradicional, Misgav-Ladach, 3 Camadas, Intraparto, Emergência, Gemelar, Acretismo/PAS), bloco de manejo de HPP, equipe completa (CFM 1.638/2002), checklist OMS, classificação de Robson;
