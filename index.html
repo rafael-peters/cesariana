@@ -220,7 +220,27 @@ input[type="checkbox"]{width:17px;height:17px;cursor:pointer;accent-color:var(--
 .opt-tag.default{background:var(--c-success-bg);border:1px solid var(--c-success)}
 .opt-tag button{background:none;border:none;cursor:pointer;padding:0 2px;font-size:.85em}
 .opt-tag .rm{color:var(--c-danger);font-weight:700}
-.opt-tag .df{color:var(--c-primary-600);font-size:.75em}
+.opt-tag .df{color:var(--c-ink-500);font-size:1em;line-height:1}
+.opt-tag .df:hover{color:var(--c-warning)}
+.opt-tag .df.on{color:var(--c-warning)}
+.tec-section{border:1px solid var(--c-line);border-radius:var(--r-md);margin-bottom:8px;background:var(--c-surface-alt)}
+.tec-section .tec-head{display:flex;align-items:center;justify-content:space-between;width:100%;padding:9px 12px;background:none;border:none;cursor:pointer;font-weight:600;font-size:.88rem;color:var(--c-ink-900);text-align:left}
+.tec-section .tec-chev{color:var(--c-ink-500);transition:transform var(--dur) var(--ease)}
+.tec-section.open .tec-chev{transform:rotate(180deg)}
+.tec-section .tec-body{display:none;padding:0 12px 12px;border-top:1px solid var(--c-line-soft)}
+.tec-section.open .tec-body{display:block}
+.tec-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px;font-size:.8rem}
+.tec-row span{flex:0 0 175px;color:var(--c-ink-700)}
+.tec-row select{flex:1;min-width:180px;font-size:.78rem;padding:4px 6px}
+.tec-sub{margin:12px 0 2px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--c-ink-500)}
+.check-mini{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:var(--c-ink-700);cursor:pointer}
+.tec-cam{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px}
+.tec-cam .check-mini{flex:0 0 175px}
+.tec-cam select{flex:1;min-width:140px;font-size:.75rem;padding:3px 6px}
+.tec-cam.off select{opacity:.4}
+.tec-mod{display:inline-block;margin-left:6px;padding:1px 7px;background:var(--c-warning-bg);color:var(--c-warning);border-radius:var(--r-pill);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.tec-checks{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.tec-restore{margin-top:12px;font-size:.75rem;padding:5px 10px}
 .add-row{display:flex;gap:8px;margin-top:6px}
 .add-row input{flex:1}
 
@@ -1644,6 +1664,18 @@ input[type="checkbox"]{width:17px;height:17px;cursor:pointer;accent-color:var(--
     </button>
     <div class="card-body" id="cfgListas"></div>
   </div>
+
+  <div class="card">
+    <button type="button" class="card-header" onclick="toggleCard(this)">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>
+      Presets de Técnica — Cesariana <span class="hint">(o que cada preset preenche na aba Descrição)</span>
+      <span class="resumo"></span><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="card-body">
+      <div class="info-note">Alterações aqui mudam o que cada chip de preset aplica na aba Descrição — não alteram a paciente atual. Ficam salvas neste navegador (e entram no backup .json). As opções vêm das listas acima: para um valor novo, adicione-o primeiro na lista correspondente.</div>
+      <div id="cfgTecnicas"></div>
+    </div>
+  </div>
 </section>
 </main>
 <button class="fab" id="fabGerar" onclick="gerarAtual()">
@@ -1818,8 +1850,12 @@ const CONFIG_PADRAO = {
 let CONFIG = null;
 function clonar(o){ return JSON.parse(JSON.stringify(o)); }
 
+/* NB: referencia TECNICAS e TEC_CHECKS (consts declaradas mais abaixo no arquivo).
+   Seguro porque carregarConfig só roda em runtime (init/importarConfig/restaurarPadroes);
+   nunca chamar no top-level do script — daria ReferenceError (TDZ). */
 function carregarConfig(){
   CONFIG = clonar(CONFIG_PADRAO);
+  CONFIG.tecnicas = clonar(TECNICAS);
   try {
     const saved = localStorage.getItem(LS_KEY);
     if (saved) {
@@ -1837,9 +1873,23 @@ function carregarConfig(){
             }
           });
         }
+        if (s.tecnicas && typeof s.tecnicas === 'object') {
+          Object.keys(CONFIG.tecnicas).forEach(k => {
+            const st = s.tecnicas[k];
+            if (!st || typeof st !== 'object') return;
+            const t = CONFIG.tecnicas[k];
+            if (st.campos && typeof st.campos === 'object') Object.keys(t.campos).forEach(id => { if (typeof st.campos[id] === 'string') t.campos[id] = st.campos[id]; });
+            if (st.camadas && typeof st.camadas === 'object') Object.keys(t.camadas).forEach(c => {
+              const cam = st.camadas[c];
+              if (Array.isArray(cam) && typeof cam[0] === 'boolean' && (cam[1] === undefined || typeof cam[1] === 'string') && (cam[2] === undefined || typeof cam[2] === 'string')) t.camadas[c] = cam.slice(0, 3);
+            });
+            if (st.checks && typeof st.checks === 'object') { t.checks = {}; TEC_CHECKS.forEach(par => { if (st.checks[par[0]] === true) t.checks[par[0]] = true; }); }
+            if (st.editado === true) t.editado = true;
+          });
+        }
       }
     }
-  } catch(e) { CONFIG = clonar(CONFIG_PADRAO); }
+  } catch(e) { CONFIG = clonar(CONFIG_PADRAO); CONFIG.tecnicas = clonar(TECNICAS); }
 }
 function salvarConfig(){
   try { localStorage.setItem(LS_KEY, JSON.stringify(CONFIG)); } catch(e) {}
@@ -3024,8 +3074,8 @@ function gerarSumarioAlta(){
   s += SEP;
   s += 'PROCEDIMENTO REALIZADO\n';
   if (cesarea) {
-    const t = TECNICAS[tecnicaAtual];
-    s += 'Cesariana' + (t ? ' — ' + t.nome.replace('Cesariana segmentar transversa — ','').replace('Cesariana ','') : '') + (v('al-data-parto') ? ' em ' + dataBR(v('al-data-parto')) : '') + (v('dc-anestesia') ? ', sob ' + v('dc-anestesia').toLowerCase() : '') + '.\n';
+    const t = CONFIG.tecnicas[tecnicaAtual];
+    s += 'Cesariana' + (t ? ' — ' + t.nome.replace('Cesariana segmentar transversa — ','').replace('Cesariana ','') + (t.editado ? ' (técnica personalizada — ver descrição cirúrgica)' : '') : '') + (v('al-data-parto') ? ' em ' + dataBR(v('al-data-parto')) : '') + (v('dc-anestesia') ? ', sob ' + v('dc-anestesia').toLowerCase() : '') + '.\n';
     if (chk('dc-laqueadura')) s += 'Laqueadura tubária no mesmo ato (' + (v('dc-laq-tecnica') || 'técnica registrada') + '), com consentimento conforme Lei 9.263/96 (red. Lei 14.443/2022).\n';
   } else {
     s += (v('pv-carater') ? 'Parto vaginal — ' + v('pv-carater').toLowerCase() : 'Parto vaginal') + (v('al-data-parto') ? ' em ' + dataBR(v('al-data-parto')) : '') + '.\n';
@@ -3381,7 +3431,7 @@ const TECNICAS = {
 let tecnicaAtual = 'tradicional';
 const TEC_RESET = [['incisoesPele','dc-incisao'],['aberturasParede','dc-subcutaneo-ab'],['aberturasCavidade','dc-peritonio-ab'],['histerotomias','dc-histerotomia'],['extensoes','dc-extensao'],['dequitacoes','dc-dequitacao'],['uterotonicos','dc-uterotonico'],['extracoes','dc-extracao']];
 function aplicarTecnica(key, btn, silencioso){
-  const t = TECNICAS[key];
+  const t = CONFIG.tecnicas[key];
   if (!t) return;
   tecnicaAtual = key;
   document.querySelectorAll('[data-preset]').forEach(c => c.classList.toggle('active', c.dataset.preset === key));
@@ -3400,9 +3450,9 @@ function aplicarTecnica(key, btn, silencioso){
     const def = CAMADAS.find(x => x.key === k);
     setCamada(k, c[0], c[1] !== undefined ? c[1] : def.fio, c[2] !== undefined ? c[2] : def.tec);
   });
-  ['dc-azitro','dc-preparo-vaginal','dc-gemelar'].forEach(id => {
-    const marcado = !!t.checks[id];
-    if ($(id)) $(id).checked = marcado;
+  TEC_CHECKS.forEach(par => {
+    const id = par[0];
+    if ($(id)) $(id).checked = !!t.checks[id];
   });
   $('rn2-bloco').classList.toggle('hidden', !chk('dc-gemelar'));
   atualizarUtero();
@@ -3413,7 +3463,7 @@ function aplicarTecnica(key, btn, silencioso){
 /* ================= GERADOR: DESCRIÇÃO ================= */
 function linha(rotulo, valor){ return valor ? rotulo + valor + '\n' : ''; }
 function gerarDescricao(){
-  const t = TECNICAS[tecnicaAtual] || TECNICAS.tradicional;
+  const t = CONFIG.tecnicas[tecnicaAtual] || CONFIG.tecnicas.tradicional;
   const SEP = '________________________________________\n';
   let s = '';
   s += 'DESCRIÇÃO CIRÚRGICA — CESARIANA\n';
@@ -3456,7 +3506,7 @@ function gerarDescricao(){
   if (chk('dc-checklist')) s += 'Checklist de Cirurgia Segura (OMS) aplicado: sign in, time out e sign out realizados.\n';
   s += SEP;
   s += 'DESCRIÇÃO DO ATO OPERATÓRIO\n';
-  s += 'Técnica: ' + t.nome + '\n\n';
+  s += 'Técnica: ' + t.nome + (t.editado ? ' — preset personalizado pelo cirurgião' : '') + '\n\n';
   let n = 1;
   const passo = txt => { s += (n++) + '. ' + txt + '\n'; };
   if (v('dc-incisao')) passo('Incisão da pele: ' + v('dc-incisao') + '.');
@@ -3523,7 +3573,8 @@ function gerarDescricao(){
   s += 'Paciente encaminhada a: ' + v('dc-destino') + '.\n';
   s += linha('Condições de saída de sala: ', v('dc-condicoes'));
   s += SEP;
-  s += 'Referência da técnica: ' + t.ref + '\n\n';
+  if (t.editado) s += 'Preset de técnica personalizado pelo cirurgião — a referência bibliográfica de fábrica foi omitida; a descrição acima reflete os passos efetivamente configurados.\n\n';
+  else s += 'Referência da técnica: ' + t.ref + '\n\n';
   s += (v('dc-eq-cirurgiao') || (CONFIG.medico + ' — ' + CONFIG.crm)) + '\n';
   s += 'Documento gerado em ' + dataBR(hojeISO()) + ' às ' + agoraHora() + ' com ferramenta local de apoio; conferido e assinado sob responsabilidade do médico assistente.\n';
   abrirModal('Descrição Cirúrgica — pré-visualização', s);
@@ -3913,8 +3964,10 @@ function renderListasConfig(){
     let html = '<h3>' + esc(lista.rotulo) + '</h3><div class="opt-list">';
     lista.opcoes.forEach((opt, i) => {
       const isDefault = opt === lista.padrao;
-      html += '<span class="opt-tag' + (isDefault ? ' default' : '') + '">' + esc(opt) +
-        (isDefault ? ' <span class="hint">(padrão)</span>' : ' <button class="df" title="Tornar padrão" onclick="setPadraoLista(\'' + key + '\',' + i + ')">definir padrão</button>') +
+      html += '<span class="opt-tag' + (isDefault ? ' default' : '') + '">' +
+        '<button class="df' + (isDefault ? ' on' : '') + '" title="' + (isDefault ? 'Opção padrão — clique para deixar o campo sem padrão' : 'Tornar esta a opção padrão') + '" aria-label="' + (isDefault ? 'Opção padrão — clique para deixar o campo sem padrão' : 'Tornar esta a opção padrão') + '" onclick="setPadraoLista(\'' + key + '\',' + i + ')">' + (isDefault ? '★' : '☆') + '</button>' +
+        esc(opt) +
+        (isDefault ? ' <span class="hint">(padrão)</span>' : '') +
         ' <button class="rm" title="Remover" onclick="removerOpcao(\'' + key + '\',' + i + ')">&times;</button></span>';
     });
     html += '</div><div class="add-row"><input id="cfg-add-' + key + '" placeholder="Nova opção..."><button class="btn btn-secondary" onclick="addOpcao(\'' + key + '\')">+ Adicionar</button></div>';
@@ -3926,18 +3979,124 @@ function addOpcao(key){
   const t = v('cfg-add-' + key);
   if (!t) return;
   CONFIG.listas[key].opcoes.push(t);
-  salvarConfig(); renderListasConfig(); initCombos();
+  salvarConfig(); renderListasConfig(); renderTecnicasConfig(); initCombos();
 }
 function removerOpcao(key, i){
   const lista = CONFIG.listas[key];
   const removida = lista.opcoes.splice(i, 1)[0];
-  if (lista.padrao === removida) lista.padrao = lista.opcoes[0] || '';
-  salvarConfig(); renderListasConfig(); initCombos();
+  if (lista.padrao === removida) lista.padrao = '';
+  salvarConfig(); renderListasConfig(); renderTecnicasConfig(); initCombos();
 }
 function setPadraoLista(key, i){
-  CONFIG.listas[key].padrao = CONFIG.listas[key].opcoes[i];
+  const lista = CONFIG.listas[key];
+  const opt = lista.opcoes[i];
+  if (lista.padrao === opt) {
+    lista.padrao = '';
+    toast('Padrão removido — o campo iniciará vazio');
+  } else {
+    lista.padrao = opt;
+    toast('Opção padrão definida — vale para "Nova paciente" e ao limpar abas');
+  }
   salvarConfig(); renderListasConfig();
 }
+
+/* ---- Presets de técnica (editáveis; persistem em CONFIG.tecnicas) ---- */
+const TEC_ROTULOS = { tradicional: 'Tradicional (Pfannenstiel-Kerr)', misgav: 'Misgav-Ladach (Stark)', tresCamadas: 'Três camadas', intraparto: 'Intraparto', emergencia: 'Emergência (categoria 1)', gemelar: 'Gemelar', acretismo: 'Acretismo (PAS)' };
+const TEC_CAMPOS_INFO = {
+  'dc-carater': { rotulo: 'Caráter' },
+  'dc-incisao': { rotulo: 'Incisão da pele', lista: 'incisoesPele' },
+  'dc-subcutaneo-ab': { rotulo: 'Abertura da parede', lista: 'aberturasParede' },
+  'dc-peritonio-ab': { rotulo: 'Abertura da cavidade', lista: 'aberturasCavidade' },
+  'dc-histerotomia': { rotulo: 'Histerotomia', lista: 'histerotomias' },
+  'dc-extensao': { rotulo: 'Extensão da histerotomia', lista: 'extensoes' },
+  'dc-extracao': { rotulo: 'Extração fetal', lista: 'extracoes' },
+  'dc-dequitacao': { rotulo: 'Dequitação', lista: 'dequitacoes' },
+  'dc-uterotonico': { rotulo: 'Uterotônico', lista: 'uterotonicos' },
+  'dc-clampeamento': { rotulo: 'Clampeamento do cordão' },
+  'dc-tp': { rotulo: 'Em trabalho de parto' }
+};
+const TEC_CHECKS = [['dc-azitro', 'Azitromicina 500 mg IV adjuvante'], ['dc-preparo-vaginal', 'Preparo vaginal com antisséptico'], ['dc-gemelar', 'Gestação gemelar']];
+function tecOptionsHtml(opcoes, atual){
+  const ops = opcoes.slice();
+  if (atual && ops.indexOf(atual) === -1) ops.unshift(atual);
+  let h = '';
+  ops.forEach(op => { h += '<option value="' + esc(op) + '"' + (op === atual ? ' selected' : '') + '>' + esc(op) + '</option>'; });
+  return h;
+}
+function tecOpcoesCampo(id){
+  const info = TEC_CAMPOS_INFO[id];
+  if (info && info.lista && CONFIG.listas[info.lista]) return CONFIG.listas[info.lista].opcoes;
+  const el = $(id);
+  const ops = [];
+  if (el && el.tagName === 'SELECT') { for (let i = 0; i < el.options.length; i++) ops.push(el.options[i].value); }
+  return ops;
+}
+function renderTecnicasConfig(){
+  const cont = $('cfgTecnicas');
+  if (!cont) return;
+  const abertos = {};
+  cont.querySelectorAll('.tec-section.open').forEach(el => { abertos[el.dataset.tec] = true; });
+  cont.innerHTML = '';
+  Object.keys(CONFIG.tecnicas).forEach(key => {
+    const t = CONFIG.tecnicas[key];
+    const sec = document.createElement('div');
+    sec.className = 'tec-section' + (abertos[key] ? ' open' : '');
+    sec.dataset.tec = key;
+    let html = '<button type="button" class="tec-head" onclick="this.parentNode.classList.toggle(\'open\')"><span>' + esc(TEC_ROTULOS[key] || key) + ' <span class="tec-mod" id="tecmod-' + key + '"' + (t.editado ? '' : ' style="display:none"') + '>modificado</span></span><span class="tec-chev">&#9662;</span></button><div class="tec-body">';
+    Object.keys(t.campos).forEach(id => {
+      const info = TEC_CAMPOS_INFO[id] || { rotulo: id };
+      html += '<label class="tec-row"><span>' + esc(info.rotulo) + '</span><select onchange="tecSetCampo(\'' + key + '\',\'' + id + '\',this.value)">' + tecOptionsHtml(tecOpcoesCampo(id), t.campos[id]) + '</select></label>';
+    });
+    html += '<div class="tec-sub">Suturas</div>';
+    CAMADAS.forEach(c => {
+      const cam = t.camadas[c.key] || [c.on];
+      const on = !!cam[0];
+      const fio = cam[1] !== undefined ? cam[1] : c.fio;
+      const tec = cam[2] !== undefined ? cam[2] : c.tec;
+      const base = 'cfgtec-' + key + '-' + c.key;
+      html += '<div class="tec-cam' + (on ? '' : ' off') + '"><label class="check-mini"><input type="checkbox" id="' + base + '-on"' + (on ? ' checked' : '') + ' onchange="tecSetCamada(\'' + key + '\',\'' + c.key + '\')"> ' + esc(c.nome) + '</label>' +
+        '<select id="' + base + '-fio"' + (on ? '' : ' disabled') + ' onchange="tecSetCamada(\'' + key + '\',\'' + c.key + '\')">' + tecOptionsHtml(CONFIG.listas.fios.opcoes, fio) + '</select>' +
+        '<select id="' + base + '-tec"' + (on ? '' : ' disabled') + ' onchange="tecSetCamada(\'' + key + '\',\'' + c.key + '\')">' + tecOptionsHtml(CONFIG.listas.tecnicasSutura.opcoes, tec) + '</select></div>';
+    });
+    html += '<div class="tec-checks">';
+    TEC_CHECKS.forEach(par => {
+      html += '<label class="check-mini"><input type="checkbox"' + (t.checks[par[0]] ? ' checked' : '') + ' onchange="tecSetCheck(\'' + key + '\',\'' + par[0] + '\',this.checked)"> ' + par[1] + '</label>';
+    });
+    html += '</div><button type="button" class="btn btn-secondary tec-restore" onclick="tecRestaurar(\'' + key + '\')">Restaurar este preset</button></div>';
+    sec.innerHTML = html;
+    cont.appendChild(sec);
+  });
+}
+/* Marca o preset como personalizado: sinaliza na UI e faz gerarDescricao/alta
+   omitirem a referência bibliográfica de fábrica (que deixaria de valer). */
+function tecMarcarEditado(key){
+  CONFIG.tecnicas[key].editado = true;
+  const badge = $('tecmod-' + key);
+  if (badge) badge.style.display = '';
+}
+function tecSetCampo(key, id, val){ CONFIG.tecnicas[key].campos[id] = val; tecMarcarEditado(key); salvarConfig(); }
+function tecSetCamada(key, camKey){
+  const base = 'cfgtec-' + key + '-' + camKey;
+  const on = chk(base + '-on');
+  CONFIG.tecnicas[key].camadas[camKey] = [on, v(base + '-fio'), v(base + '-tec')];
+  const cb = $(base + '-on');
+  if (cb && cb.parentNode && cb.parentNode.parentNode) cb.parentNode.parentNode.classList.toggle('off', !on);
+  const selFio = $(base + '-fio'), selTec = $(base + '-tec');
+  if (selFio) selFio.disabled = !on;
+  if (selTec) selTec.disabled = !on;
+  tecMarcarEditado(key); salvarConfig();
+}
+function tecSetCheck(key, id, on){
+  if (on) CONFIG.tecnicas[key].checks[id] = true;
+  else delete CONFIG.tecnicas[key].checks[id];
+  tecMarcarEditado(key); salvarConfig();
+}
+function tecRestaurar(key){
+  CONFIG.tecnicas[key] = clonar(TECNICAS[key]);
+  salvarConfig(); renderTecnicasConfig();
+  toast('Preset "' + (TEC_ROTULOS[key] || key) + '" restaurado ao padrão de fábrica');
+}
+
 function exportarConfig(){
   const blob = new Blob([JSON.stringify(CONFIG, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
@@ -3973,7 +4132,7 @@ function restaurarPadroes(){
 function aplicarConfigNaUI(){
   setV('cfg-medico', CONFIG.medico); setV('cfg-crm', CONFIG.crm); setV('cfg-hospital', CONFIG.hospital);
   $('cfg-ascii').checked = !!CONFIG.prefAscii;
-  renderEquipe(); renderListasConfig(); initCombos(); aplicarTema();
+  renderEquipe(); renderListasConfig(); renderTecnicasConfig(); initCombos(); aplicarTema();
 }
 
 /* ================= INIT ================= */

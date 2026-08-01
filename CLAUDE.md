@@ -29,7 +29,7 @@ São o mesmo arquivo. Não crie build, não separe versões, não duplique.
 
 - **CSS**: tokens em `:root` (+ `[data-theme]` claro/escuro) → topbar/tabs → banner → cards colapsáveis → combos → tabela de suturas → EVA → modal → `@media print` → responsivo.
 - **HTML**: `<header>` (marca, tema, 8 abas) → banner paciente (+ faixa de alergias + botões do Caso Portátil) → `<main>` com `#tab-admissao`, `#tab-plano`, `#tab-descricao` (cesárea), `#tab-parto` (vaginal), `#tab-evolucao`, `#tab-prescricao`, `#tab-alta`, `#tab-config` → modais (preview, confirmação, caso) → toast → footer.
-- **JS** (blocos): CONFIG (`CONFIG_PADRAO`/`carregarConfig`/`salvarConfig`) · utils (`v`/`setV`/`chk`/`dataBR`/`toAscii`/`esc`) · tema · tabs/cards · combos editáveis · banner/`syncPaciente`/`novaPaciente`/`limparAba` · EVA · tabela de suturas (`CAMADAS`) · útero SVG + alertas · clipboard/modal/toast · autosave · **plano terapêutico (`PLANO_BASE`/`PLANO_MOD`/`PT_CENARIOS`/`gerarPlano`)** · **presets de técnica (`TECNICAS`)** · **`gerarDescricao`** · evolução (`gerarEvolucao`) · prescrição (`rxTemplates`/`gerarPrescricao`/escore TEV/`doseEnoxa`) · config UI · `init`.
+- **JS** (blocos): CONFIG (`CONFIG_PADRAO`/`carregarConfig`/`salvarConfig`) · utils (`v`/`setV`/`chk`/`dataBR`/`toAscii`/`esc`) · tema · tabs/cards · combos editáveis · banner/`syncPaciente`/`novaPaciente`/`limparAba` · EVA · tabela de suturas (`CAMADAS`) · útero SVG + alertas · clipboard/modal/toast · autosave · **plano terapêutico (`PLANO_BASE`/`PLANO_MOD`/`PT_CENARIOS`/`gerarPlano`)** · **presets de técnica (`TECNICAS` = fábrica; cópia editável em `CONFIG.tecnicas`)** · **`gerarDescricao`** · evolução (`gerarEvolucao`) · prescrição (`rxTemplates`/`gerarPrescricao`/escore TEV/`doseEnoxa`) · config UI · `init`.
 
 ## v4 — blocos novos (resumo para quem for editar)
 
@@ -39,7 +39,7 @@ São o mesmo arquivo. Não crie build, não separe versões, não duplique.
 - **Alta** (`al-`): `AL_DOC` seleciona sumário/orientações/atestado; `CID_CENARIO` sugere diagnósticos pelos cenários; CID em atestado só com `al-cid-autorizado` (CFM 2.381/2024).
 - **Guardas clínicas transversais**: `cenarioAtivo('hiv')` e `cenarioAtivo('obitoFetal')` suprimem/trocam amamentação, "Parabéns", seção RN e alertas neonatais em evolução/sumário/orientações. **Todo texto novo sobre aleitamento/RN deve passar por essas guardas.**
 - **Caso Portátil**: `exportarCaso`/`importarCaso` cifram o dump do `sessionStorage`; após importar, chamar `sincronizarUIaposRestauro()` (nunca `alergiaMudou`/`montarRxItens`, que descartariam edições restauradas da prescrição).
-- Smoke tests: `scratchpad/smoke.js` … `smoke6.js` (6 suítes; a 6 cobre v4 + roundtrip AES real).
+- Smoke tests: `scratchpad/smoke.js` … `smoke6.js` (6 suítes históricas, não versionadas; a 6 cobria v4 + roundtrip AES real) e **`scratchpad/smoke7.js` (versionada no repo — presets editáveis/`CONFIG.tecnicas`, estrela de padrão, merge robusto, flag `editado`)**. Rodar `node scratchpad/smoke7.js` antes de considerar pronto.
 
 ## Plano Terapêutico: por que é a primeira aba do fluxo do MV
 
@@ -52,7 +52,7 @@ O prontuário do hospital (MV PEP) **bloqueia a Descrição Cirúrgica** até ex
 
 ## Dados clínicos ficam em objetos, não espalhados
 
-Opções, textos-padrão e doses vivem em **`CONFIG_PADRAO.listas`** (editável pelo usuário na aba Config) e em **`TECNICAS`** (presets). Para adicionar/alterar conteúdo clínico, edite esses objetos — não hardcode dentro das funções de geração.
+Opções, textos-padrão e doses vivem em **`CONFIG_PADRAO.listas`** (editável pelo usuário na aba Config, incluindo a escolha da opção padrão por estrela) e em **`TECNICAS`** (presets de fábrica). Os presets também são editáveis pelo usuário: `carregarConfig` clona `TECNICAS` para **`CONFIG.tecnicas`** e mescla overrides salvos (campos/camadas/checks); `aplicarTecnica`, `gerarDescricao` e o sumário de alta leem **`CONFIG.tecnicas`**, nunca `TECNICAS` direto (que serve só de fábrica para `tecRestaurar`). A UI fica na Config → "Presets de Técnica — Cesariana" (`renderTecnicasConfig`), com os valores limitados às listas correspondentes. Para adicionar/alterar conteúdo clínico, edite esses objetos — não hardcode dentro das funções de geração.
 
 ## Ao alterar
 
